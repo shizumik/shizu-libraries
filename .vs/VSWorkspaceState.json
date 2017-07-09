@@ -2,9 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\shizu-pickup",
-    "\\shizu-pickup\\Cpp-Toys",
-    "\\shizu-pickup\\Cpp-Toys\\Rational"
+    "\\shizu-pickup\\cpp-toys",
+    "\\shizu-pickup\\cpp-toys\\Rational"
   ],
-  "SelectedNode": "\\shizu-pickup\\Cpp-Toys\\Cpp-Toys.sln",
+  "SelectedNode": "\\shizu-pickup\\cpp-toys\\Rational\\Rational.sln",
   "PreviewInSolutionExplorer": false
 }

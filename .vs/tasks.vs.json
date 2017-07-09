@@ -1,0 +1,10 @@
+{
+  "version": "0.2.1",
+  "tasks": [
+    {
+      "taskName": "task-cpp-toys",
+      "appliesTo": "shizu-pickup/cpp-toys/",
+      "type": "command"
+    }
+  ]
+}
