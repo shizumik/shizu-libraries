@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+/shizu-pickup/Cpp-Toys/Cpp-Toys.vcxproj.filters
+/shizu-pickup/Cpp-Toys/Cpp-Toys.vcxproj
+/shizu-pickup/Cpp-Toys/Cpp-Toys.sln
+/shizu-pickup/Cpp-Toys/.vs/Cpp-Toys/v15
