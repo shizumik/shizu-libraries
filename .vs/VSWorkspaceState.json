@@ -1,8 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\shizu-pickup"
+    "\\shizu-pickup",
+    "\\shizu-pickup\\Cpp-Toys"
   ],
-  "SelectedNode": "\\shizu-pickup\\Cpp-Toys",
+  "SelectedNode": "\\shizu-pickup\\Cpp-Toys\\Cpp-Toys.vcxproj.filters",
   "PreviewInSolutionExplorer": false
 }
