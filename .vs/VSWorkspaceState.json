@@ -2,7 +2,8 @@
   "ExpandedNodes": [
     "",
     "\\shizu-pickup",
-    "\\shizu-pickup\\Cpp-Toys"
+    "\\shizu-pickup\\Cpp-Toys",
+    "\\shizu-pickup\\Cpp-Toys\\Rational"
   ],
   "SelectedNode": "\\shizu-pickup\\Cpp-Toys\\Cpp-Toys.vcxproj.filters",
   "PreviewInSolutionExplorer": false
