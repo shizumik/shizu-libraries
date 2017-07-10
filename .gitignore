@@ -40,3 +40,7 @@
 /shizu-pickup/cpp-toys/Rational/Rational.vcxproj.filters
 /shizu-pickup/cpp-toys/Rational/Rational.vcxproj
 /shizu-pickup/cpp-toys/Rational/Rational.sln
+.vs/
+Debug/
+*.sln
+*.vcx*
