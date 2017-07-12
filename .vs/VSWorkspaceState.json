@@ -2,8 +2,11 @@
   "ExpandedNodes": [
     "",
     "\\shizu-pickup",
-    "\\shizu-pickup\\algorithm-related"
+    "\\shizu-pickup\\algorithm-related",
+    "\\shizu-pickup\\algorithm-related\\queue_with_stack",
+    "\\shizu-pickup\\cpp-toys",
+    "\\shizu-pickup\\cpp-toys\\Rational"
   ],
-  "SelectedNode": "\\shizu-pickup\\algorithm-related",
+  "SelectedNode": "\\shizu-pickup\\algorithm-related\\queue_with_stack\\test.cpp",
   "PreviewInSolutionExplorer": false
 }
