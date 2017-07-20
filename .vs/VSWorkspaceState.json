@@ -3,8 +3,9 @@
     "",
     "\\shizu-pickup",
     "\\shizu-pickup\\algorithm-related",
-    "\\shizu-pickup\\DIP\\SaveAndLoadBMP"
+    "\\shizu-pickup\\algorithm-related\\sort",
+    "\\shizu-pickup\\algorithm-related\\sort\\sort_related"
   ],
-  "SelectedNode": "\\shizu-pickup\\algorithm-related\\sort",
+  "SelectedNode": "\\shizu-pickup\\algorithm-related\\sort\\sort_related\\insertion_sort.cpp",
   "PreviewInSolutionExplorer": false
 }
