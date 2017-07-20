@@ -3,8 +3,8 @@
     "",
     "\\shizu-pickup",
     "\\shizu-pickup\\DIP",
-    "\\shizu-pickup\\DIP\\letter_recognition"
+    "\\shizu-pickup\\DIP\\SaveAndLoadBMP"
   ],
-  "SelectedNode": "\\shizu-pickup\\DIP\\letter_recognition",
+  "SelectedNode": "\\.gitignore",
   "PreviewInSolutionExplorer": false
 }
