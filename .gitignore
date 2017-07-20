@@ -33,6 +33,9 @@
 
 .vs
 Debug/
+*.bmp
+Release/
+*.tlog
 *.sln
 *.vcx*
 /shizu-pickup/cpp-toys/function-somesome/test.cpp

@@ -2,14 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\shizu-pickup",
-<<<<<<< HEAD
-    "\\shizu-pickup\\DIP"
+    "\\shizu-pickup\\DIP",
+    "\\shizu-pickup\\DIP\\letter_recognition"
   ],
-  "SelectedNode": "\\shizu-pickup\\DIP",
-=======
-    "\\shizu-pickup\\cpp-toys"
-  ],
-  "SelectedNode": "\\shizu-pickup\\cpp-toys\\function-somesome",
->>>>>>> ba10e7743f84a8ffdec2c6344ed95f586309ee69
+  "SelectedNode": "\\shizu-pickup\\DIP\\letter_recognition",
   "PreviewInSolutionExplorer": false
 }
