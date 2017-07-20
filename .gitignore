@@ -50,3 +50,7 @@ Release/
 /shizu-pickup/DIP/letter_recognition/x64/Release/letter_recognition.iobj
 =======
 >>>>>>> ba10e7743f84a8ffdec2c6344ed95f586309ee69
+/shizu-pickup/algorithm-related/sort/insertion_sort/targetver.h
+/shizu-pickup/algorithm-related/sort/insertion_sort/stdafx.h
+/shizu-pickup/algorithm-related/sort/insertion_sort/stdafx.cpp
+/shizu-pickup/algorithm-related/sort/insertion_sort/ReadMe.txt

@@ -2,9 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\shizu-pickup",
-    "\\shizu-pickup\\DIP",
+    "\\shizu-pickup\\algorithm-related",
     "\\shizu-pickup\\DIP\\SaveAndLoadBMP"
   ],
-  "SelectedNode": "\\.gitignore",
+  "SelectedNode": "\\shizu-pickup\\algorithm-related\\sort",
   "PreviewInSolutionExplorer": false
 }
