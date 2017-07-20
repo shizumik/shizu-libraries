@@ -36,3 +36,14 @@ Debug/
 *.sln
 *.vcx*
 /shizu-pickup/cpp-toys/function-somesome/test.cpp
+<<<<<<< HEAD
+/shizu-pickup/DIP/letter_recognition/x64/Release/letter_r.C5C4EF03.tlog
+/shizu-pickup/DIP/letter_recognition/YzolaPhilo_OUT.bmp
+/shizu-pickup/DIP/letter_recognition/YzolaPhilo.bmp
+/shizu-pickup/DIP/letter_recognition/x64/Release/vc141.pdb
+/shizu-pickup/DIP/letter_recognition/x64/Release/letter_recognition.pdb
+/shizu-pickup/DIP/letter_recognition/x64/Release/letter_recognition.log
+/shizu-pickup/DIP/letter_recognition/x64/Release/letter_recognition.ipdb
+/shizu-pickup/DIP/letter_recognition/x64/Release/letter_recognition.iobj
+=======
+>>>>>>> ba10e7743f84a8ffdec2c6344ed95f586309ee69
