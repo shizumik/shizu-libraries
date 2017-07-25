@@ -2,10 +2,8 @@
   "ExpandedNodes": [
     "",
     "\\shizu-pickup",
-    "\\shizu-pickup\\algorithm-related",
-    "\\shizu-pickup\\algorithm-related\\sort",
-    "\\shizu-pickup\\algorithm-related\\sort\\sort_related"
+    "\\shizu-pickup\\algorithm-related"
   ],
-  "SelectedNode": "\\shizu-pickup\\algorithm-related\\sort\\sort_related\\insertion_sort.cpp",
+  "SelectedNode": "\\shizu-pickup\\cpp-toys",
   "PreviewInSolutionExplorer": false
 }

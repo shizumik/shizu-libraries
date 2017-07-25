@@ -13,7 +13,7 @@ bool readBmpFile()
 	BITMAPINFOHEADER strInfo;
 
 	char strFile[30];//bmp文件名  
-	IMAGEDATA *imagedata = NULL;//动态分配存储原图片的像素信息
+	IMAGEDATA *imagedata = NULL;//动态分配存储原图片的像素信息的二维数组  
 	int width, height;//图片的宽度和高度  
 	cout << "请输入所要读取的文件名:" << endl;
 	cin >> strFile;
@@ -45,26 +45,12 @@ bool readBmpFile()
 			{
 				(*(imagedata + i * width + j)).blue = 0;
 				(*(imagedata + i * width + j)).green = 0;
-				(*(imagedata + i * width + j)).red = 0;
+				(*(imagedata + i *  width + j)).red = 0;
 			}
 		}
 
 		//读出图片的像素数据  
 		fread(imagedata, sizeof(struct tagIMAGEDATA) * width, height, fpi);
-
-		/*****************************图连通域标记开始************************************/
-		//保存图片的像素数据进二维数组
-		int GrayLvlData[572][388] = { 0 };
-		for (int i = 0; i < height; ++i)
-		{
-			for (int j = 0; j < width; ++j)
-			{
-				int gray_level = ((*(imagedata + i * width + j)).red * 0.3 + (*(imagedata + i * width + j)).green * 0.59
-					+ (*(imagedata + i * width + j)).blue * 0.11);
-				GrayLvlData[i][j] = gray_level > 200 ? 255 : 0;
-			}
-		}
-		/*****************************图连通域标记结束************************************/
 
 		fclose(fpi);
 	}
@@ -76,7 +62,7 @@ bool readBmpFile()
 
 
 	//保存bmp图片  
-	if ((fpw = fopen("YzolaPhilo_OUT.bmp", "wb")) == NULL)
+	if ((fpw = fopen("lena_.bmp", "wb")) == NULL)
 	{
 		cout << "create the bmp file error!" << endl;
 		return NULL;
@@ -96,36 +82,39 @@ bool readBmpFile()
 	{
 		for (int j = 0; j < width; ++j)
 		{
-			int rgb_sum = (*(imagedata + i * width + j)).red + (*(imagedata + i * width + j)).green
-				+ (*(imagedata + i * width + j)).blue;
-		
-			if (i < 120)
-			{
-				(*(imagedata + i * width + j)).blue = 0;
-				(*(imagedata + i * width + j)).green = 0;
-				(*(imagedata + i *  width + j)).red = 0;
-				fwrite(&(*(imagedata + i * width + j)).red, 1, sizeof(BYTE), fpw);
-				fwrite(&(*(imagedata + i * width + j)).green, 1, sizeof(BYTE), fpw);
-				fwrite(&(*(imagedata + i * width + j)).blue, 1, sizeof(BYTE), fpw);
-			}
-			else if (rgb_sum != 0)
-			{    //每个RGB都是白色！
-				//cout << rand() % 255 + 1 << endl;
-				(*(imagedata + i * width + j)).blue = rand() % 256;
-				//cout << rand() % 255 + 1 << endl;
-				(*(imagedata + i * width + j)).green = rand() % 256;
-				//cout << rand() % 255 + 1 << endl;
-				(*(imagedata + i *  width + j)).red = rand() % 256;
-				fwrite(&(*(imagedata + i * width + j)).red, 1, sizeof(BYTE), fpw);
-				fwrite(&(*(imagedata + i * width + j)).green, 1, sizeof(BYTE), fpw);
-				fwrite(&(*(imagedata + i * width + j)).blue, 1, sizeof(BYTE), fpw);
-			}
-			else
-			{
-				fwrite(&(*(imagedata + i * width + j)).red, 1, sizeof(BYTE), fpw);
-				fwrite(&(*(imagedata + i * width + j)).green, 1, sizeof(BYTE), fpw);
-				fwrite(&(*(imagedata + i * width + j)).blue, 1, sizeof(BYTE), fpw);
-			}
+			//gray-level picture
+			int gray = (*(imagedata + i *  width + j)).red * 0.3 +
+				(*(imagedata + i *  width + j)).green * 0.59 + (*(imagedata + i *  width + j)).blue;
+			//gray = gray > 200? 255 : 0;
+			(*(imagedata + i *  width + j)).red = gray / 3;
+			(*(imagedata + i *  width + j)).green = gray / 3;
+			(*(imagedata + i *  width + j)).blue = gray / 3;
+			/*(*(imagedata + i *  width + j)).red = (*(imagedata + i *  width + j)).red * 0.3 > 128 ? 1 : 0;
+			(*(imagedata + i *  width + j)).green = (*(imagedata + i *  width + j)).green * 0.59 > 128 ? 1 : 0;
+			(*(imagedata + i *  width + j)).blue = (*(imagedata + i *  width + j)).blue * 0.11 > 128 ? 1 : 0;*/
+			fwrite(&(*(imagedata + i * width + j)).red, 1, sizeof(BYTE), fpw);
+			fwrite(&(*(imagedata + i * width + j)).green, 1, sizeof(BYTE), fpw);
+			fwrite(&(*(imagedata + i * width + j)).blue, 1, sizeof(BYTE), fpw);
+			//spatial filter  for a mask 3x3
+			//if (i > 0 && j > 0 && i < height - 1 && j < width - 1)
+			//{
+			//	float cof = 1 / 9;
+			//	(*(imagedata + i * width + j)).blue = 
+			//		static_cast<int>(((*(imagedata + i * width + j)).blue + (*(imagedata + (i-1) * width + j-1)).blue + (*(imagedata + (i - 1) * width + j)).blue
+			//			+ (*(imagedata + (i - 1) * width + j + 1)).blue + (*(imagedata + (i+1) * width + j)).blue + (*(imagedata + (i + 1) * width + j - 1)).blue
+			//			+ (*(imagedata + (i + 1) * width + j + 1)).blue + (*(imagedata + i * width + j + 1)).blue + (*(imagedata + i * width + j - 1)).blue)*cof);
+			//	(*(imagedata + i * width + j)).green =
+			//		static_cast<int>(((*(imagedata + i * width + j)).green + (*(imagedata + (i - 1) * width + j - 1)).green + (*(imagedata + (i - 1) * width + j)).green
+			//			+ (*(imagedata + (i - 1) * width + j + 1)).green + (*(imagedata + (i + 1) * width + j)).green + (*(imagedata + (i + 1) * width + j - 1)).green
+			//			+ (*(imagedata + (i + 1) * width + j + 1)).green + (*(imagedata + i * width + j + 1)).green + (*(imagedata + i * width + j - 1)).green)*cof);
+			//	(*(imagedata + i * width + j)).red =
+			//		static_cast<int>(((*(imagedata + i * width + j)).red + (*(imagedata + (i - 1) * width + j - 1)).red + (*(imagedata + (i - 1) * width + j)).red
+			//			+ (*(imagedata + (i - 1) * width + j + 1)).red + (*(imagedata + (i + 1) * width + j)).red + (*(imagedata + (i + 1) * width + j - 1)).red
+			//			+ (*(imagedata + (i + 1) * width + j + 1)).red + (*(imagedata + i * width + j + 1)).red + (*(imagedata + i * width + j - 1)).red)*cof);
+			//	fwrite(&(*(imagedata + i * width + j)).red, 1, sizeof(BYTE), fpw);
+			//	fwrite(&(*(imagedata + i * width + j)).green, 1, sizeof(BYTE), fpw);
+			//	fwrite(&(*(imagedata + i * width + j)).blue, 1, sizeof(BYTE), fpw);
+			//}
 		}
 	}
 	fclose(fpw);

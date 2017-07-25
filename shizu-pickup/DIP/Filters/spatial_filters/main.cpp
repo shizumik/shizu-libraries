@@ -1,8 +1,13 @@
-
 #include "bmpreadfile.h"
-int main() {
-	
+
+
+int main()
+{
 	readBmpFile();
+
+
+
 	
 	return 0;
+
 }
