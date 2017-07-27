@@ -7,8 +7,8 @@
 
 IMAGEDATA* LoadBMP();
 
-int SaveBMP24Bit(IMAGEDATA* img);
-int SaveBMPBin(IMAGEDATA* img);
+int SaveBMP(IMAGEDATA* img);
+//int SaveBMPBin(IMAGEDATA* img);
 
 
 #endif // !BMP_IO_H

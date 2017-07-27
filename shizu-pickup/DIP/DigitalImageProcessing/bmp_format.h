@@ -49,4 +49,5 @@ typedef struct tagIMAGEDATA
 	BYTE blue;
 }IMAGEDATA;
 
+
 #endif // !BMP_FORMAT_H

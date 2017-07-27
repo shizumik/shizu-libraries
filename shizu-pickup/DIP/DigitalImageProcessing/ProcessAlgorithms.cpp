@@ -25,7 +25,7 @@ void fillRunVectors(IMAGEDATA* imagedata, int& NumberOfRuns, std::vector<int>& s
 	std::vector<int>& enRun, std::vector<int>& rowRun)
 {
 	#define rgb_sum(i,j) ((*(imagedata + i * width + j)).red + (*(imagedata + i * width + j)).green + (*(imagedata + i * width + j)).blue)
-	for (int i = 0; i < height / 25; ++i)
+	for (int i = 0; i < height; ++i)
 	{
 		if (rgb_sum(i, 0) != 0)
 		{
@@ -33,12 +33,12 @@ void fillRunVectors(IMAGEDATA* imagedata, int& NumberOfRuns, std::vector<int>& s
 			stRun.push_back(0);
 			rowRun.push_back(i);
 		}
-		for (int j = 1; j < width / 25; ++j)
+		for (int j = 1; j < width; ++j)
 		{
 			//std::cout << rgb_sum(i, j) << " ";
 			if (rgb_sum(i, j - 1) == 0 && rgb_sum(i, j) != 0)
 			{
-				NumberOfRuns++;										
+				NumberOfRuns++;
 				stRun.push_back(j);
 				rowRun.push_back(i);
 			}
@@ -48,9 +48,9 @@ void fillRunVectors(IMAGEDATA* imagedata, int& NumberOfRuns, std::vector<int>& s
 			}
 
 		}
-		if (rgb_sum(i,width / 25 - 1))
+		if (rgb_sum(i, width - 1))
 		{
-			enRun.push_back(width / 25 - 1);
+			enRun.push_back(width - 1);
 		}
 
 	}
@@ -160,15 +160,15 @@ void connect(IMAGEDATA* imagedata)
 	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
 	replaceSameLabel(runLabels, equivalences);
 
-	for (int i = 0; i < runLabels.size(); ++i)
-	{
-		for (int j = stRun[i]; j < enRun[i]; ++j)
-		{
-			int rgb = runLabels[i] % 255;
-			(*(imagedata + rowRun[i] * width + j)).red = rgb * 0.3;
-			(*(imagedata + rowRun[i] * width + j)).green = rgb * 0.59;
-			(*(imagedata + rowRun[i] * width + j)).blue = rgb * 0.11;
-		}
-	}
+	//for (int i = 0; i < runLabels.size(); ++i)
+	//{
+	//	for (int j = stRun[i]; j < enRun[i]; ++j)
+	//	{
+	//		int rgb = runLabels[i] * 26 > 255 ? 175 : runLabels[i] * 26;
+	//		(*(imagedata + rowRun[i] * width + j)).red = rgb * 0.3;
+	//		(*(imagedata + rowRun[i] * width + j)).green = rgb * 0.59;
+	//		(*(imagedata + rowRun[i] * width + j)).blue = rgb * 0.11;
+	//	}
+	//}
 
 }

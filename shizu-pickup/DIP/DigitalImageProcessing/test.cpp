@@ -8,10 +8,10 @@ int main()
 	//Binarization(img);
 
 	start = clock();
-	//connect(img);
+	connect(img);
 	end = clock();
 
-	int response = SaveBMPBin(img);
+	int response = SaveBMP(img);
 	std::cout << response << std::endl;
 	delete[] img;
 
