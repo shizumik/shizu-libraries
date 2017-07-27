@@ -5,10 +5,10 @@
 #include "bmp_format.h"
 #include <iostream>
 
+IMAGEDATA* LoadBMP();
 
+int SaveBMP24Bit(IMAGEDATA* img);
+int SaveBMPBin(IMAGEDATA* img);
 
-IMAGEDATA* LoadBMP(char strFile[30]);
-
-int SaveBMP(char strFile[30], IMAGEDATA* img);
 
 #endif // !BMP_IO_H

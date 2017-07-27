@@ -5,9 +5,11 @@ BITMAPFILEHEADER strHead;
 BITMAPINFOHEADER strInfo;
 int width, height;
 
-
-IMAGEDATA* LoadBMP(char strFile[30])
+IMAGEDATA* LoadBMP()
 {
+	char strFile[30];
+	std::cout << "Please Input BMP Filename: " << std::endl;
+	std::cin >> strFile;
 	FILE *fpi;
 	fpi = fopen(strFile, "rb");
 	if (fpi != NULL)
@@ -43,8 +45,11 @@ IMAGEDATA* LoadBMP(char strFile[30])
 
 }
 
-int SaveBMP(char strFile[30], IMAGEDATA* img)
+int SaveBMP24Bit(IMAGEDATA* img)
 {
+	char strFile[30];
+	std::cout << "Please Input BMP Filename: " << std::endl;
+	std::cin >> strFile;
 	FILE *fpw;
 	if ((fpw = fopen(strFile, "wb")) == NULL)
 	{
@@ -58,6 +63,34 @@ int SaveBMP(char strFile[30], IMAGEDATA* img)
 	strInfo.biHeight = height;
 	fwrite(&strInfo, 1, sizeof(tagBITMAPINFOHEADER), fpw);
 	for(int i = 0; i < height; ++i)
+		for (int j = 0; j < width; ++j)
+		{
+			fwrite(&(*(img + i * width + j)).red, 1, sizeof(BYTE), fpw);
+			fwrite(&(*(img + i * width + j)).green, 1, sizeof(BYTE), fpw);
+			fwrite(&(*(img + i * width + j)).blue, 1, sizeof(BYTE), fpw);
+		}
+	fclose(fpw);
+	return 0;
+}
+
+int SaveBMPBin(IMAGEDATA* img)
+{
+	char strFile[30];
+	std::cout << "Please Input BMP Filename: " << std::endl;
+	std::cin >> strFile;
+	FILE *fpw;
+	if ((fpw = fopen(strFile, "wb")) == NULL)
+	{
+		std::cerr << "create bmp file error!" << std::endl;
+		return -1;
+	}
+	WORD bfType = 0x4d42;
+	fwrite(&bfType, 1, sizeof(WORD), fpw);
+	fwrite(&strHead, 1, sizeof(tagBITMAPFILEHEADER), fpw);
+	strInfo.biWidth = width;
+	strInfo.biHeight = height;
+	fwrite(&strInfo, 1, sizeof(tagBITMAPINFOHEADER), fpw);
+	for (int i = 0; i < height; ++i)
 		for (int j = 0; j < width; ++j)
 		{
 			fwrite(&(*(img + i * width + j)).red, 1, sizeof(BYTE), fpw);

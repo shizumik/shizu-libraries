@@ -84,7 +84,7 @@ bool readBmpFile()
 		{
 			//gray-level picture
 			int gray = (*(imagedata + i *  width + j)).red * 0.3 +
-				(*(imagedata + i *  width + j)).green * 0.59 + (*(imagedata + i *  width + j)).blue;
+				(*(imagedata + i *  width + j)).green * 0.59 + (*(imagedata + i *  width + j)).blue * 0.11;
 			//gray = gray > 200? 255 : 0;
 			(*(imagedata + i *  width + j)).red = gray / 3;
 			(*(imagedata + i *  width + j)).green = gray / 3;

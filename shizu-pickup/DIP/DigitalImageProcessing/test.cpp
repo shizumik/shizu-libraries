@@ -3,13 +3,20 @@
 
 int main()
 {
-	IMAGEDATA *img = LoadBMP("YzolaPhilo.bmp");
-	img = union_find(img);
-	int response = SaveBMP("YzolaPhilo_Done.bmp", img);
-	std::cout << response << std::endl;
+	clock_t start, end;
+	IMAGEDATA *img = LoadBMP();
+	//Binarization(img);
 
+	start = clock();
+	//connect(img);
+	end = clock();
+
+	int response = SaveBMPBin(img);
+	std::cout << response << std::endl;
 	delete[] img;
-	
+
+	std::cout << "Runtime: " << end - start << std::endl;
+
 	return 0;
 
 }
