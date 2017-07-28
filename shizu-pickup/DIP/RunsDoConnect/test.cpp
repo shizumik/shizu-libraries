@@ -8,13 +8,11 @@ int main()
 	//Binarization(img);
 
 	start = clock();
-	connect(img);
+	//connect(img);
 	end = clock();
 
 	int response = SaveBMP(img);
 	std::cout << response << std::endl;
-	delete[] img;
-
 	std::cout << "Runtime: " << end - start << std::endl;
 
 	return 0;

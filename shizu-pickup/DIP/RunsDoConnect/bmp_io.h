@@ -8,7 +8,7 @@
 IMAGEDATA* LoadBMP();
 
 int SaveBMP(IMAGEDATA* img);
-//int SaveBMPBin(IMAGEDATA* img);
 
-
+void showBmpHead(BITMAPFILEHEADER pBmpHead);
+void showBmpInforHead(tagBITMAPINFOHEADER pBmpInforHead);
 #endif // !BMP_IO_H

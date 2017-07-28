@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ProcessAlgorithms.h"
-
  
 extern BITMAPFILEHEADER strHead;
 extern BITMAPINFOHEADER strInfo;
@@ -14,10 +13,30 @@ void Binarization(IMAGEDATA* imagedata)
 		{
 			int gray_level = (*(imagedata + i * width + j)).red * 0.3 + (*(imagedata + i * width + j)).green * 0.59
 				+ (*(imagedata + i * width + j)).blue * 0.11;
-			gray_level = gray_level > 60 ? 255 : 0;   //change your treethold here ps:lena 60
+			gray_level = gray_level > 128 ? 255 : 0;   //change your treethold here ps:lena 60
 			(*(imagedata + i *  width + j)).red = gray_level; //0.3
 			(*(imagedata + i *  width + j)).green = gray_level;//0.59
 			(*(imagedata + i *  width + j)).blue = gray_level;//0.11
+		}
+}
+
+void paintbmp(IMAGEDATA* imagedata)
+{
+	for (int i = 0; i < height; ++i)
+		for (int j = 0; j < width; ++j)
+		{
+			if (color(i, j) != 0)
+			{
+				(*(imagedata + i * width + j)).blue = 255;
+				(*(imagedata + i * width + j)).green = 255;
+				(*(imagedata + i * width + j)).red = 255;
+			}
+			else
+			{
+				(*(imagedata + i * width + j)).blue = 0;
+				(*(imagedata + i * width + j)).green = 0;
+				(*(imagedata + i * width + j)).red = 0;
+			}
 		}
 }
 
@@ -25,9 +44,9 @@ void fillRunVectors(IMAGEDATA* imagedata, int& NumberOfRuns, std::vector<int>& s
 	std::vector<int>& enRun, std::vector<int>& rowRun)
 {
 	#define rgb_sum(i,j) ((*(imagedata + i * width + j)).red + (*(imagedata + i * width + j)).green + (*(imagedata + i * width + j)).blue)
-	for (int i = 0; i < height; ++i)
+	for (int i = 0; i < height; ++i)               //o(height * width)
 	{
-		if (rgb_sum(i, 0) != 0)
+		if (rgb_sum(i, 0) != 0)           
 		{
 			NumberOfRuns++;
 			stRun.push_back(0);
@@ -35,7 +54,6 @@ void fillRunVectors(IMAGEDATA* imagedata, int& NumberOfRuns, std::vector<int>& s
 		}
 		for (int j = 1; j < width; ++j)
 		{
-			//std::cout << rgb_sum(i, j) << " ";
 			if (rgb_sum(i, j - 1) == 0 && rgb_sum(i, j) != 0)
 			{
 				NumberOfRuns++;
@@ -44,11 +62,11 @@ void fillRunVectors(IMAGEDATA* imagedata, int& NumberOfRuns, std::vector<int>& s
 			}
 			else if (rgb_sum(i, j - 1) != 0 && rgb_sum(i, j) == 0)
 			{
-				enRun.push_back(j);   // j-1 -> j : add a right pixel to the enRun
+				enRun.push_back(j);   
 			}
 
 		}
-		if (rgb_sum(i, width - 1))
+		if (rgb_sum(i, width - 1))        
 		{
 			enRun.push_back(width - 1);
 		}
@@ -61,9 +79,6 @@ void firstPass(std::vector<int>& stRun, std::vector<int>& enRun, std::vector<int
 	std::vector<int>& runLabels, std::vector<std::pair<int, int>>& equivalences, int offset)
 {
 	runLabels.assign(NumberOfRuns, 0);
-	//for (auto n : runLabels)
-	//	std::cout << n << " ";
-	//std::cout << std::endl;
 	int idxLabel = 1;
 	int curRowIdx = 0;
 	int firstRunOnCur = 0;
@@ -77,7 +92,6 @@ void firstPass(std::vector<int>& stRun, std::vector<int>& enRun, std::vector<int
 			firstRunOnPre = firstRunOnCur;
 			lastRunOnPre = i - 1;
 			firstRunOnCur = i;
-
 		}
 		for (int j = firstRunOnPre; j <= lastRunOnPre; j++)
 		{
@@ -144,9 +158,6 @@ void replaceSameLabel(std::vector<int>& runLabels, std::vector<std::pair<int, in
 		runLabels[i] = labelFlag[runLabels[i] - 1];  //1-17
 	}
 	std::cout << "runLabels numbers: " << runLabels.size() << std::endl;
-	//for (auto n : runLabels)
-	//	std::cout << n << " ";
-	//std::cout << std::endl;
 }
 
 void connect(IMAGEDATA* imagedata)
@@ -159,16 +170,27 @@ void connect(IMAGEDATA* imagedata)
 	int offset = 1; //1 8-n; 0 4-n
 	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
 	replaceSameLabel(runLabels, equivalences);
-
-	//for (int i = 0; i < runLabels.size(); ++i)
-	//{
-	//	for (int j = stRun[i]; j < enRun[i]; ++j)
-	//	{
-	//		int rgb = runLabels[i] * 26 > 255 ? 175 : runLabels[i] * 26;
-	//		(*(imagedata + rowRun[i] * width + j)).red = rgb * 0.3;
-	//		(*(imagedata + rowRun[i] * width + j)).green = rgb * 0.59;
-	//		(*(imagedata + rowRun[i] * width + j)).blue = rgb * 0.11;
-	//	}
-	//}
+	for (int i = 0; i < runLabels.size(); ++i)
+	{
+		for (int j = stRun[i]; j < enRun[i]; ++j)
+		{
+			int rgb = runLabels[i] * 20 > 256 ? 200 : runLabels[i] * 20;
+			(*(imagedata + rowRun[i] * width + j)).red = rgb * 0.3 * runLabels[i];
+			(*(imagedata + rowRun[i] * width + j)).green = rgb * 0.59 * runLabels[i];
+			(*(imagedata + rowRun[i] * width + j)).blue = rgb * 0.11 * runLabels[i];
+		}
+	}
 
 }
+
+//void floodfill(IMAGEDATA* imagedata, int x, int y, int oldcolor, int newcolor)
+//{
+//	if (color(x, y) == oldcolor)
+//	{
+//		putpixel(x, y, newcolor);
+//		floodFill(imagedata, x + 1, y, oldcolor, newcolor);
+//		floodFill(imagedata, x, y + 1, oldcolor, newcolor);
+//		floodFill(imagedata, x - 1, y, oldcolor, newcolor);
+//		floodFill(imagedata, x, y - 1, oldcolor, newcolor);
+//	}
+//}
