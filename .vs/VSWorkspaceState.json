@@ -2,8 +2,8 @@
   "ExpandedNodes": [
     "",
     "\\shizu-pickup",
-    "\\shizu-pickup\\algorithm-related"
+    "\\shizu-pickup\\DIP"
   ],
-  "SelectedNode": "\\shizu-pickup\\cpp-toys",
+  "SelectedNode": "\\shizu-pickup\\DIP\\DoingWithOpenCV",
   "PreviewInSolutionExplorer": false
 }

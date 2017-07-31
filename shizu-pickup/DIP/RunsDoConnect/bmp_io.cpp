@@ -52,6 +52,7 @@ IMAGEDATA* LoadBMP()
 					}
 
 				}
+			delete[] imgdata;
 			return imagedata;
 		}
 		else if (strInfo.biBitCount == 24)
@@ -78,6 +79,7 @@ IMAGEDATA* LoadBMP()
 
 }
 
+
 int SaveBMP(IMAGEDATA* img)
 {
 	char strFile[30];
@@ -99,7 +101,7 @@ int SaveBMP(IMAGEDATA* img)
 
 	strInfo.biSize = sizeof(BITMAPINFOHEADER);
 	strInfo.biSizeImage = 0;
-	strInfo.biBitCount = 1;
+	strInfo.biBitCount = 24;
 	strInfo.biClrUsed = 0;
 	fwrite(&strInfo, 1, sizeof(tagBITMAPINFOHEADER), fpw);
 	fwrite(&strRGB, 1, sizeof(tagRGBQUAD), fpw);
@@ -112,25 +114,25 @@ int SaveBMP(IMAGEDATA* img)
 }
 
 void showBmpHead(BITMAPFILEHEADER pBmpHead) {
-	std::cout << "ä½å›¾æ–‡ä»¶å¤´:" << std::endl;
-	std::cout << "æ–‡ä»¶å¤§å°:" << pBmpHead.bfSize << std::endl;
-	std::cout << "ä¿ç•™å­—_1:" << pBmpHead.bfReserved1 << std::endl;
-	std::cout << "ä¿ç•™å­—_2:" << pBmpHead.bfReserved2 << std::endl;
-	std::cout << "å®žé™…ä½å›¾æ•°æ®çš„åç§»å­—èŠ‚æ•°:" << pBmpHead.bfOffBits << std::endl << std::endl;
+	std::cout << "Î»Í¼ÎÄ¼þÍ·:" << std::endl;
+	std::cout << "ÎÄ¼þ´óÐ¡:" << pBmpHead.bfSize << std::endl;
+	std::cout << "±£Áô×Ö_1:" << pBmpHead.bfReserved1 << std::endl;
+	std::cout << "±£Áô×Ö_2:" << pBmpHead.bfReserved2 << std::endl;
+	std::cout << "Êµ¼ÊÎ»Í¼Êý¾ÝµÄÆ«ÒÆ×Ö½ÚÊý:" << pBmpHead.bfOffBits << std::endl << std::endl;
 }
 
 void showBmpInforHead(tagBITMAPINFOHEADER pBmpInforHead) {
-	std::cout << "ä½å›¾ä¿¡æ¯å¤´:" << std::endl;
-	std::cout << "ç»“æž„ä½“çš„é•¿åº¦:" << pBmpInforHead.biSize << std::endl;
-	std::cout << "ä½å›¾å®½:" << pBmpInforHead.biWidth << std::endl;
-	std::cout << "ä½å›¾é«˜:" << pBmpInforHead.biHeight << std::endl;
-	std::cout << "biPlaneså¹³é¢æ•°:" << pBmpInforHead.biPlanes << std::endl;
-	std::cout << "biBitCounté‡‡ç”¨é¢œè‰²ä½æ•°:" << pBmpInforHead.biBitCount << std::endl;
-	std::cout << "åŽ‹ç¼©æ–¹å¼:" << pBmpInforHead.biCompression << std::endl;
-	std::cout << "biSizeImageå®žé™…ä½å›¾æ•°æ®å ç”¨çš„å­—èŠ‚æ•°:" << pBmpInforHead.biSizeImage << std::endl;
-	std::cout << "Xæ–¹å‘åˆ†è¾¨çŽ‡:" << pBmpInforHead.biXPelsPerMeter << std::endl;
-	std::cout << "Yæ–¹å‘åˆ†è¾¨çŽ‡:" << pBmpInforHead.biYPelsPerMeter << std::endl;
-	std::cout << "ä½¿ç”¨çš„é¢œè‰²æ•°:" << pBmpInforHead.biClrUsed << std::endl;
-	std::cout << "é‡è¦é¢œè‰²æ•°:" << pBmpInforHead.biClrImportant << std::endl;
+	std::cout << "Î»Í¼ÐÅÏ¢Í·:" << std::endl;
+	std::cout << "½á¹¹ÌåµÄ³¤¶È:" << pBmpInforHead.biSize << std::endl;
+	std::cout << "Î»Í¼¿E" << pBmpInforHead.biWidth << std::endl;
+	std::cout << "Î»Í¼¸ß:" << pBmpInforHead.biHeight << std::endl;
+	std::cout << "biPlanesÆ½ÃæÊý:" << pBmpInforHead.biPlanes << std::endl;
+	std::cout << "biBitCount²ÉÓÃÑÕÉ«Î»Êý:" << pBmpInforHead.biBitCount << std::endl;
+	std::cout << "Ñ¹Ëõ·½Ê½:" << pBmpInforHead.biCompression << std::endl;
+	std::cout << "biSizeImageÊµ¼ÊÎ»Í¼Êý¾ÝÕ¼ÓÃµÄ×Ö½ÚÊý:" << pBmpInforHead.biSizeImage << std::endl;
+	std::cout << "X·½Ïò·Ö±æÂÊ:" << pBmpInforHead.biXPelsPerMeter << std::endl;
+	std::cout << "Y·½Ïò·Ö±æÂÊ:" << pBmpInforHead.biYPelsPerMeter << std::endl;
+	std::cout << "Ê¹ÓÃµÄÑÕÉ«Êý:" << pBmpInforHead.biClrUsed << std::endl;
+	std::cout << "ÖØÒªÑÕÉ«Êý:" << pBmpInforHead.biClrImportant << std::endl;
 }
 

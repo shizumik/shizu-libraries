@@ -97,13 +97,13 @@ void firstPass(std::vector<int>& stRun, std::vector<int>& enRun, std::vector<int
 		{
 			if (stRun[i] <= enRun[j] + offset && enRun[i] >= stRun[j] - offset && rowRun[i] == rowRun[j] + 1)
 			{
-				if (runLabels[i] == 0) // æ²¡æœ‰è¢«æ ‡å·è¿‡
+				if (runLabels[i] == 0) // Ã»ÓĞ±»±êºÅ¹ı
 					runLabels[i] = runLabels[j];
-				else if (runLabels[i] != runLabels[j])// å·²ç»è¢«æ ‡å·             
-					equivalences.push_back(std::make_pair(runLabels[i], runLabels[j])); // ä¿å­˜ç­‰ä»·å¯¹
+				else if (runLabels[i] != runLabels[j])// ÒÑ¾­±»±êºÅ             
+					equivalences.push_back(std::make_pair(runLabels[i], runLabels[j])); // ±£´æµÈ¼Û¶Ô
 			}
 		}
-		if (runLabels[i] == 0) // æ²¡æœ‰ä¸å‰ä¸€åˆ—çš„ä»»ä½•runé‡åˆ
+		if (runLabels[i] == 0) // Ã»ÓĞÓëÇ°Ò»ÁĞµÄÈÎºÎrunÖØºÏ
 		{
 			//std::cout << "enter here" << std::endl;
 			runLabels[i] = idxLabel++;
@@ -120,7 +120,7 @@ void replaceSameLabel(std::vector<int>& runLabels, std::vector<std::pair<int, in
 	int maxLabel = *max_element(runLabels.begin(), runLabels.end());
 	std::vector<std::vector<bool>> eqTab(maxLabel, std::vector<bool>(maxLabel, false));
 	std::vector<std::pair<int, int>>::iterator vecPairIt = equivalence.begin();
-	while (vecPairIt != equivalence.end()) //æ— å‘å›¾é‚»æ¥çŸ©é˜µ
+	while (vecPairIt != equivalence.end()) //ÎŞÏòÍ¼ÁÚ½Ó¾ØÕó
 	{
 		eqTab[vecPairIt->first - 1][vecPairIt->second - 1] = true;
 		eqTab[vecPairIt->second - 1][vecPairIt->first - 1] = true;
@@ -142,14 +142,14 @@ void replaceSameLabel(std::vector<int>& runLabels, std::vector<std::pair<int, in
 		{
 			for (std::vector<bool>::size_type k = 0; k != eqTab[tempList[j] - 1].size(); k++)
 			{
-				if (eqTab[tempList[j] - 1][k] && !labelFlag[k]) //!labelFlag[k] é˜²æ­¢é‡å¤æ·»åŠ ç›¸åŒ
+				if (eqTab[tempList[j] - 1][k] && !labelFlag[k]) //!labelFlag[k] ·ÀÖ¹ÖØ¸´Ìí¼ÓÏàÍ¬
 				{
-					tempList.push_back(k + 1);              //å°†ç¬¬kå·æ·»åŠ åˆ°listä¸­ï¼Œç”±äºæ ‡å·ä»1å¼€å§‹ï¼Œpush k+1
-					labelFlag[k] = equaList.size() + 1;		//ç½®ä½labelflag[k]ï¼Œå¹¶ä¸”ç›¸åŒè¡Œçš„kth run éƒ½æœ‰ç›¸åŒçš„æ•°å€¼
+					tempList.push_back(k + 1);              //½«µÚkºÅÌí¼Óµ½listÖĞ£¬ÓÉÓÚ±êºÅ´Ó1¿ªÊ¼£¬push k+1
+					labelFlag[k] = equaList.size() + 1;		//ÖÃÎ»labelflag[k]£¬²¢ÇÒÏàÍ¬ĞĞµÄkth run ¶¼ÓĞÏàÍ¬µÄÊıÖµ
 				}
 			}
 		}
-		equaList.push_back(tempList);                       //ä¸€æ¡è¿æ¥åŒºåŸŸå®Œæˆï¼Œæ·»åŠ åˆ°equallistä¸­
+		equaList.push_back(tempList);                       //Ò»ÌõÁ¬½ÓÇøÓòÍê³É£¬Ìí¼Óµ½equallistÖĞ
 		tempList.clear();									// clear templist, do the next 
 	}
 	std::cout << "connected regions: " << equaList.size() << std::endl; // numbers of the connect regions
@@ -159,7 +159,6 @@ void replaceSameLabel(std::vector<int>& runLabels, std::vector<std::pair<int, in
 	}
 	std::cout << "runLabels numbers: " << runLabels.size() << std::endl;
 }
-
 
 void connect(IMAGEDATA* imagedata)
 {

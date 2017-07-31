@@ -13,7 +13,7 @@ int main()
 
 	int response = SaveBMP(img);
 	std::cout << response << std::endl;
-	std::cout << "Runtime: " << end - start << std::endl;
+	//std::cout << "Runtime: " << end - start << std::endl;
 
 	return 0;
 
