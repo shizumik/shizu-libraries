@@ -4,7 +4,7 @@
 
 BITMAPFILEHEADER strHead;
 BITMAPINFOHEADER strInfo;
-RGBQUAD strRGB;
+WORD strRGB; // two-value picture  62 - 54 = 8
 int width, height;
 
 IMAGEDATA* LoadBMP()
@@ -17,38 +17,46 @@ IMAGEDATA* LoadBMP()
 	if (fpi != NULL)
 	{
 		WORD bfType;
-		fread(&bfType, 1, sizeof(WORD), fpi);
+		fread(&bfType, sizeof(WORD), 1, fpi);
 		if (0x4d42 != bfType)
 		{
 			std::cerr << "The file is not a bmp file!" << std::endl;
 			return NULL;
 		}
-		fread(&strHead, 1, sizeof(tagBITMAPFILEHEADER), fpi);
-		fread(&strInfo, 1, sizeof(tagBITMAPINFOHEADER), fpi);
-		fread(&strRGB, 1, sizeof(tagRGBQUAD), fpi);
-		//showBmpHead(strHead);
-		//showBmpInforHead(strInfo);
+		fread(&strHead, sizeof(tagBITMAPFILEHEADER), 1, fpi);
+		fread(&strInfo, sizeof(tagBITMAPINFOHEADER), 1, fpi);
+		showBmpHead(strHead);
+		showBmpInforHead(strInfo);
 		width = strInfo.biWidth;
 		height = strInfo.biHeight;
 		if (strInfo.biBitCount == 1)
 		{
-			BYTE *imgdata = new BYTE[width * height / 8];
-			fread(imgdata, sizeof(BYTE) * width / 8, height, fpi);
+			fread(&strRGB, sizeof(WORD), 1, fpi);
+			
+			width = 5120;
+
+			BYTE *imgdata = new BYTE[width * height / 8];           //1bit/pixel
+			//std::cout << width;
+			for (int i = 0; i < width * height / 8; ++i)
+				*(imgdata + i) = 0;
+
+			fread(imgdata, sizeof(BYTE) * width / 8, height , fpi);
 			fclose(fpi);
-			IMAGEDATA *imagedata = new IMAGEDATA[width * height];
+			IMAGEDATA *imagedata = new IMAGEDATA[width * height];    //24bit/pixel
 			int count = 0, k = 0;
 			for (int i = 0; i < height; ++i)
-				for (int j = 0; j < width, k < width * height / 8; ++j)
+				for (int j = 0; j < width/*, k < width * height / 8*/; ++j)
 				{
-					//(*(imagedata + i * width + j)).blue = 0;
-					//(*(imagedata + i * width + j)).green = 0;
-					//(*(imagedata + i * width + j)).red = 0;
 					(*(imagedata + i * width + j)).blue = (*(imagedata + i * width + j)).green
-						= (*(imagedata + i * width + j)).red = (*(imgdata + k) << count++ >> 7) == 1 ? 255 : 0;
-					if (count > 7)
+						= (*(imagedata + i * width + j)).red = (((*(imgdata + k) << count) >> 7) & 0x01) == 1 ? 255 : 0;
+					if (count == 7)
 					{
 						count = 0;
-						k++;
+						++k;
+					}
+					else
+					{
+						++count;
 					}
 
 				}
@@ -58,15 +66,7 @@ IMAGEDATA* LoadBMP()
 		else if (strInfo.biBitCount == 24)
 		{
 			IMAGEDATA *imagedata = new IMAGEDATA[width * height];
-			for (int i = 0; i < height; ++i)
-				for (int j = 0; j < width; ++j)
-				{
-					(*(imagedata + i * width + j)).blue = 0;
-					(*(imagedata + i * width + j)).green = 0;
-					(*(imagedata + i * width + j)).red = 0;
-				}
-
-			fread(imagedata, sizeof(struct tagIMAGEDATA) * width, height, fpi);
+			fread(imagedata, sizeof(struct tagIMAGEDATA), height * width, fpi);
 			fclose(fpi);
 			return imagedata;
 		}
@@ -80,7 +80,7 @@ IMAGEDATA* LoadBMP()
 }
 
 
-int SaveBMP(IMAGEDATA* img)
+int SaveBMP(IMAGEDATA* imagedata)
 {
 	char strFile[30];
 	std::cout << "Please Input BMP Filename: " << std::endl;
@@ -94,22 +94,23 @@ int SaveBMP(IMAGEDATA* img)
 	strInfo.biWidth = width;
 	strInfo.biHeight = height;
 	WORD bfType = 0x4d42;
-	//strHead.bfOffBits = 54;
+	strHead.bfOffBits = 54;
 	//strHead.bfSize = strHead.bfOffBits + width * sizeof(struct tagIMAGEDATA) * height;
-	fwrite(&bfType, 1, sizeof(WORD), fpw);
-	fwrite(&strHead, 1, sizeof(tagBITMAPFILEHEADER), fpw);
+	fwrite(&bfType, sizeof(WORD), 1, fpw);
+	fwrite(&strHead, sizeof(tagBITMAPFILEHEADER), 1, fpw);
 
 	strInfo.biSize = sizeof(BITMAPINFOHEADER);
-	strInfo.biSizeImage = 0;
+	strInfo.biSizeImage = width * height * sizeof(IMAGEDATA);
 	strInfo.biBitCount = 24;
 	strInfo.biClrUsed = 0;
-	fwrite(&strInfo, 1, sizeof(tagBITMAPINFOHEADER), fpw);
-	fwrite(&strRGB, 1, sizeof(tagRGBQUAD), fpw);
+	fwrite(&strInfo, sizeof(tagBITMAPINFOHEADER), 1, fpw);
+	//fwrite(&strRGB, 1, sizeof(tagRGBQUAD), fpw);
 	//paintbmp(img);
-
-	fwrite(img, sizeof(struct tagIMAGEDATA) * width, height, fpw);
+	showBmpHead(strHead);
+	showBmpInforHead(strInfo);
+	fwrite(imagedata, sizeof(struct tagIMAGEDATA) * width, height, fpw);
 	fclose(fpw);
-	delete[] img;
+	delete[] imagedata;
 	return 0;
 }
 
@@ -124,7 +125,7 @@ void showBmpHead(BITMAPFILEHEADER pBmpHead) {
 void showBmpInforHead(tagBITMAPINFOHEADER pBmpInforHead) {
 	std::cout << "位图信息头:" << std::endl;
 	std::cout << "结构体的长度:" << pBmpInforHead.biSize << std::endl;
-	std::cout << "位图縼E" << pBmpInforHead.biWidth << std::endl;
+	std::cout << "位图宽:" << pBmpInforHead.biWidth << std::endl;
 	std::cout << "位图高:" << pBmpInforHead.biHeight << std::endl;
 	std::cout << "biPlanes平面数:" << pBmpInforHead.biPlanes << std::endl;
 	std::cout << "biBitCount采用颜色位数:" << pBmpInforHead.biBitCount << std::endl;

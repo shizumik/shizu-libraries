@@ -2,7 +2,7 @@
 #ifndef BMP_FORMAT_H
 #define BMP_FORMAT_H
 
-#pragma pack(2)
+//#pragma pack(2)
 typedef unsigned char BYTE;
 typedef unsigned short WORD;
 typedef unsigned int DWORD;
@@ -34,12 +34,12 @@ typedef struct tagBITMAPINFOHEADER {
 }BITMAPINFOHEADER; //位图信息头定义  
 
 //灰度图也许会用到,24bit图不需要。
-typedef struct tagRGBQUAD {
-	BYTE rgbBlue; //该颜色的蓝色分量  
-	BYTE rgbGreen; //该颜色的绿色分量  
-	BYTE rgbRed; //该颜色的红色分量  
-	BYTE rgbReserved; //保留值  
-}RGBQUAD;//调色板定义  
+//typedef struct tagRGBQUAD {
+//	BYTE rgbBlue; //该颜色的蓝色分量  
+//	BYTE rgbGreen; //该颜色的绿色分量  
+//	BYTE rgbRed; //该颜色的红色分量  
+//	BYTE rgbReserved; //保留值  
+//}RGBQUAD;//调色板定义  
 
 //像素信息  
 typedef struct tagIMAGEDATA
