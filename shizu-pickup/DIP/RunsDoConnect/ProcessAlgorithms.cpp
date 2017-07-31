@@ -97,13 +97,13 @@ void firstPass(std::vector<int>& stRun, std::vector<int>& enRun, std::vector<int
 		{
 			if (stRun[i] <= enRun[j] + offset && enRun[i] >= stRun[j] - offset && rowRun[i] == rowRun[j] + 1)
 			{
-				if (runLabels[i] == 0) // û�б���Ź�
+				if (runLabels[i] == 0) // 没有被标号过
 					runLabels[i] = runLabels[j];
-				else if (runLabels[i] != runLabels[j])// �Ѿ������             
-					equivalences.push_back(std::make_pair(runLabels[i], runLabels[j])); // ����ȼ۶�
+				else if (runLabels[i] != runLabels[j])// 已经被标号             
+					equivalences.push_back(std::make_pair(runLabels[i], runLabels[j])); // 保存等价对
 			}
 		}
-		if (runLabels[i] == 0) // û����ǰһ�е��κ�run�غ�
+		if (runLabels[i] == 0) // 没有与前一列的任何run重合
 		{
 			//std::cout << "enter here" << std::endl;
 			runLabels[i] = idxLabel++;
@@ -120,7 +120,7 @@ void replaceSameLabel(std::vector<int>& runLabels, std::vector<std::pair<int, in
 	int maxLabel = *max_element(runLabels.begin(), runLabels.end());
 	std::vector<std::vector<bool>> eqTab(maxLabel, std::vector<bool>(maxLabel, false));
 	std::vector<std::pair<int, int>>::iterator vecPairIt = equivalence.begin();
-	while (vecPairIt != equivalence.end()) //����ͼ�ڽӾ���
+	while (vecPairIt != equivalence.end()) //无向图邻接矩阵
 	{
 		eqTab[vecPairIt->first - 1][vecPairIt->second - 1] = true;
 		eqTab[vecPairIt->second - 1][vecPairIt->first - 1] = true;
@@ -132,7 +132,7 @@ void replaceSameLabel(std::vector<int>& runLabels, std::vector<std::pair<int, in
 	std::cout << "maxLabel: " << maxLabel << std::endl;   // label start from 1
 	for (int i = 1; i <= maxLabel; i++)
 	{
-		if (labelFlag[i - 1])
+		if (labelFlag[i - 1])							//run already done.
 		{
 			continue;
 		}
@@ -142,23 +142,24 @@ void replaceSameLabel(std::vector<int>& runLabels, std::vector<std::pair<int, in
 		{
 			for (std::vector<bool>::size_type k = 0; k != eqTab[tempList[j] - 1].size(); k++)
 			{
-				if (eqTab[tempList[j] - 1][k] && !labelFlag[k])
+				if (eqTab[tempList[j] - 1][k] && !labelFlag[k]) //!labelFlag[k] 防止重复添加相同
 				{
-					tempList.push_back(k + 1);
-					labelFlag[k] = equaList.size() + 1;
+					tempList.push_back(k + 1);              //将第k号添加到list中，由于标号从1开始，push k+1
+					labelFlag[k] = equaList.size() + 1;		//置位labelflag[k]，并且相同行的kth run 都有相同的数值
 				}
 			}
 		}
-		equaList.push_back(tempList);
-		tempList.clear();
+		equaList.push_back(tempList);                       //一条连接区域完成，添加到equallist中
+		tempList.clear();									// clear templist, do the next 
 	}
 	std::cout << "connected regions: " << equaList.size() << std::endl; // numbers of the connect regions
 	for (std::vector<int>::size_type i = 0; i != runLabels.size(); i++)
 	{
-		runLabels[i] = labelFlag[runLabels[i] - 1];  //1-17
+		runLabels[i] = labelFlag[runLabels[i] - 1];  //1-17       
 	}
 	std::cout << "runLabels numbers: " << runLabels.size() << std::endl;
 }
+
 
 void connect(IMAGEDATA* imagedata)
 {
