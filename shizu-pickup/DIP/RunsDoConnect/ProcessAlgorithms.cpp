@@ -170,7 +170,7 @@ void connect(IMAGEDATA* imagedata)
 
 	/*************height: 0 ----------------------- height / 4******************/
 	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, 0, height / 4);
-	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset, 1);
+	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
 	replaceSameLabel(runLabels, equivalences);
 
 	for (int i = 0; i < runLabels.size(); ++i)
@@ -203,19 +203,20 @@ void connect(IMAGEDATA* imagedata)
 
 	/*************height: height / 4 ----------------------- height / 2******************/
 	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 4, height / 2);
-	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset, runLabels1[0]);
+	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
 	replaceSameLabel(runLabels, equivalences);
 
 	for (int i = 0; rowRun[i] == height / 4; ++i)
 		for (int j = 0; j < tempRuns1; ++j)
 		{
-			if (stRun[i] <= enRun1[j] + offset && enRun[i] >= stRun1[j] - offset/* && rowRun[i] == rowRun[j] + 1*/)
+			if (stRun[i] <= enRun1[j] + offset || enRun[i] >= stRun1[j] - offset/* && rowRun[i] == rowRun[j] + 1*/)
 			{
 				for (int k = 0; k != runLabels.size(); ++k)
 				{
 					if (runLabels[k] == runLabels[i])
 						runLabels[k] = runLabels1[j];
 				}
+				continue;
 			}
 		}
 
@@ -248,7 +249,7 @@ void connect(IMAGEDATA* imagedata)
 
 	/*************height: height / 2 ----------------------- height / 4 * 3******************/
 	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 2, height / 4 * 3);
-	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset, runLabels1[0]);
+	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
 	replaceSameLabel(runLabels, equivalences);
 
 	for (int i = 0; rowRun[i] == height / 2; ++i)
@@ -293,7 +294,7 @@ void connect(IMAGEDATA* imagedata)
 
 	/*************height: height / 4 * 3 ----------------------- height******************/
 	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 4 * 3, height);
-	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset, runLabels1[0]);
+	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
 	replaceSameLabel(runLabels, equivalences);
 
 	for (int i = 0; rowRun[i] == height / 4 * 3; ++i)
