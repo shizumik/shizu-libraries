@@ -25,8 +25,8 @@ IMAGEDATA* LoadBMP()
 		}
 		fread(&strHead, sizeof(tagBITMAPFILEHEADER), 1, fpi);
 		fread(&strInfo, sizeof(tagBITMAPINFOHEADER), 1, fpi);
-		showBmpHead(strHead);
-		showBmpInforHead(strInfo);
+		//showBmpHead(strHead);
+		//showBmpInforHead(strInfo);
 		width = strInfo.biWidth;
 		height = strInfo.biHeight;
 		if (strInfo.biBitCount == 1)
@@ -106,8 +106,8 @@ int SaveBMP(IMAGEDATA* imagedata)
 	fwrite(&strInfo, sizeof(tagBITMAPINFOHEADER), 1, fpw);
 	//fwrite(&strRGB, 1, sizeof(tagRGBQUAD), fpw);
 	//paintbmp(img);
-	showBmpHead(strHead);
-	showBmpInforHead(strInfo);
+	//showBmpHead(strHead);
+	//showBmpInforHead(strInfo);
 	fwrite(imagedata, sizeof(struct tagIMAGEDATA) * width, height, fpw);
 	fclose(fpw);
 	delete[] imagedata;
