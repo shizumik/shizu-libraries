@@ -168,9 +168,11 @@ void connect(IMAGEDATA* imagedata)
 	std::vector<std::pair<int, int>> equivalences;
 	int offset = 1; //1 8-n; 0 4-n
 
-	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun ,0 ,height / 2);
-	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset,1);
+	/*************height: 0 ----------------------- height / 4******************/
+	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, 0, height / 4);
+	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset, 1);
 	replaceSameLabel(runLabels, equivalences);
+
 	for (int i = 0; i < runLabels.size(); ++i)
 		for (int j = stRun[i]; j < enRun[i]; ++j)
 		{
@@ -179,41 +181,43 @@ void connect(IMAGEDATA* imagedata)
 			(*(imagedata + rowRun[i] * width + j)).green = rgb * 0.59 * runLabels[i];
 			(*(imagedata + rowRun[i] * width + j)).blue = rgb * 0.11 * runLabels[i];
 		}
-
+	/****************link part 1 ----------------------------------- 2 ***************************/
 	std::vector<int> stRun1, enRun1;   //保存最后一行的信息
 	int rowRun1;
 	std::vector<int> runLabels1;
-	int tempRuns = 0;
-	rowRun1 = (*(rowRun.end() - 1 ));
-	for (auto i = 0; i != rowRun.size(); ++i)
+	int tempRuns1 = 0;
+	rowRun1 = (*(rowRun.end() - 1));
+	std::cout << rowRun1 << std::endl;
+	for (auto i = NumberOfRuns / 2; i != NumberOfRuns; ++i)
 	{
 		if (rowRun[i] == rowRun1)
 		{
-			tempRuns++;
+			tempRuns1++;
 			stRun1.push_back(stRun[i]); //记录上部分最后一行的信息
 			enRun1.push_back(enRun[i]);
 			runLabels1.push_back(runLabels[i]);
 		}
 	}
-
+	std::cout << tempRuns1 << std::endl;
 	NumberOfRuns = 0; stRun.clear(); enRun.clear(); rowRun.clear(); equivalences.clear(); runLabels.clear(); //clear
 
-	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 2, height);
+	/*************height: height / 4 ----------------------- height / 2******************/
+	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 4, height / 2);
 	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset, runLabels1[0]);
 	replaceSameLabel(runLabels, equivalences);
-	for(int i = 0; rowRun[i] == height / 2; ++i)
-		for (int j = 0; j < tempRuns; ++j)
+
+	for (int i = 0; rowRun[i] == height / 4; ++i)
+		for (int j = 0; j < tempRuns1; ++j)
 		{
 			if (stRun[i] <= enRun1[j] + offset && enRun[i] >= stRun1[j] - offset/* && rowRun[i] == rowRun[j] + 1*/)
 			{
 				for (int k = 0; k != runLabels.size(); ++k)
 				{
-					if(runLabels[k] == runLabels[i])
+					if (runLabels[k] == runLabels[i])
 						runLabels[k] = runLabels1[j];
 				}
 			}
 		}
-	
 
 	for (int i = 0; i < runLabels.size(); ++i)
 		for (int j = stRun[i]; j < enRun[i]; ++j)
@@ -223,9 +227,99 @@ void connect(IMAGEDATA* imagedata)
 			(*(imagedata + rowRun[i] * width + j)).green = rgb * 0.59 * runLabels[i];
 			(*(imagedata + rowRun[i] * width + j)).blue = rgb * 0.11 * runLabels[i];
 		}
-	NumberOfRuns = 0; stRun.clear(); enRun.clear(); rowRun.clear(); equivalences.clear();
-}
 
+	/****************link part 2 ----------------------------------- 3 ***************************/
+	stRun1.clear(); enRun1.clear(); runLabels1.clear(); tempRuns1 = 0;// clear the last last info
+	rowRun1 = (*(rowRun.end() - 1));
+	std::cout << rowRun1 << std::endl;
+	for (auto i = NumberOfRuns / 2; i != NumberOfRuns; ++i)
+	{
+		if (rowRun[i] == rowRun1)
+		{
+			tempRuns1++;
+			stRun1.push_back(stRun[i]); //记录上部分最后一行的信息
+			enRun1.push_back(enRun[i]);
+			runLabels1.push_back(runLabels[i]);
+		}
+	}	
+	std::cout << tempRuns1 << std::endl;
+
+	NumberOfRuns = 0; stRun.clear(); enRun.clear(); rowRun.clear(); equivalences.clear(); runLabels.clear();
+
+	/*************height: height / 2 ----------------------- height / 4 * 3******************/
+	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 2, height / 4 * 3);
+	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset, runLabels1[0]);
+	replaceSameLabel(runLabels, equivalences);
+
+	for (int i = 0; rowRun[i] == height / 2; ++i)
+		for (int j = 0; j < tempRuns1; ++j)
+		{
+			if (stRun[i] <= enRun1[j] + offset && enRun[i] >= stRun1[j] - offset/* && rowRun[i] == rowRun[j] + 1*/)
+			{
+				for (int k = 0; k != runLabels.size(); ++k)
+				{
+					if (runLabels[k] == runLabels[i])
+						runLabels[k] = runLabels1[j];
+				}
+			}
+		}
+
+	for (int i = 0; i < runLabels.size(); ++i)
+		for (int j = stRun[i]; j < enRun[i]; ++j)
+		{
+			int rgb = runLabels[i] * 20 > 256 ? 200 : runLabels[i] * 20;
+			(*(imagedata + rowRun[i] * width + j)).red = rgb * 0.3 * runLabels[i];
+			(*(imagedata + rowRun[i] * width + j)).green = rgb * 0.59 * runLabels[i];
+			(*(imagedata + rowRun[i] * width + j)).blue = rgb * 0.11 * runLabels[i];
+		}
+
+	/****************link part 3 -----------------------------------4***************************/
+	stRun1.clear(); enRun1.clear(); runLabels1.clear(); tempRuns1 = 0;// clear the last last info
+	rowRun1 = (*(rowRun.end() - 1));
+	std::cout << rowRun1 << std::endl;
+	for (auto i = NumberOfRuns / 2; i != NumberOfRuns; ++i)
+	{
+		if (rowRun[i] == rowRun1)
+		{
+			tempRuns1++;
+			stRun1.push_back(stRun[i]); //记录上部分最后一行的信息
+			enRun1.push_back(enRun[i]);
+			runLabels1.push_back(runLabels[i]);
+		}
+	}
+	std::cout << tempRuns1 << std::endl;
+
+	NumberOfRuns = 0; stRun.clear(); enRun.clear(); rowRun.clear(); equivalences.clear(); runLabels.clear();
+
+	/*************height: height / 4 * 3 ----------------------- height******************/
+	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 4 * 3, height);
+	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset, runLabels1[0]);
+	replaceSameLabel(runLabels, equivalences);
+
+	for (int i = 0; rowRun[i] == height / 4 * 3; ++i)
+		for (int j = 0; j < tempRuns1; ++j)
+		{
+			if (stRun[i] <= enRun1[j] + offset && enRun[i] >= stRun1[j] - offset/* && rowRun[i] == rowRun[j] + 1*/)
+			{
+				for (int k = 0; k != runLabels.size(); ++k)
+				{
+					if (runLabels[k] == runLabels[i])
+						runLabels[k] = runLabels1[j];
+				}
+			}
+		}
+	for (int i = 0; i < runLabels.size(); ++i)
+		for (int j = stRun[i]; j < enRun[i]; ++j)
+		{
+			int rgb = runLabels[i] * 20 > 256 ? 200 : runLabels[i] * 20;
+			(*(imagedata + rowRun[i] * width + j)).red = rgb * 0.3 * runLabels[i];
+			(*(imagedata + rowRun[i] * width + j)).green = rgb * 0.59 * runLabels[i];
+			(*(imagedata + rowRun[i] * width + j)).blue = rgb * 0.11 * runLabels[i];
+		}
+	std::cout << tempRuns1 << std::endl;
+
+	NumberOfRuns = 0; stRun.clear(); enRun.clear(); rowRun.clear(); equivalences.clear(); runLabels.clear();
+}
 
 //void floodfill(IMAGEDATA* imagedata, int x, int y, int oldcolor, int newcolor)
 //{
