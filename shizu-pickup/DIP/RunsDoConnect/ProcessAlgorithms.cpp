@@ -41,10 +41,10 @@ void paintbmp(IMAGEDATA* imagedata)
 }
 
 void fillRunVectors(IMAGEDATA* imagedata, int& NumberOfRuns, std::vector<int>& stRun,
-	std::vector<int>& enRun, std::vector<int>& rowRun)
+	std::vector<int>& enRun, std::vector<int>& rowRun, int st_height, int en_height)
 {
 	#define rgb_sum(i,j) ((*(imagedata + i * width + j)).red + (*(imagedata + i * width + j)).green + (*(imagedata + i * width + j)).blue)
-	for (int i = 0; i < height; ++i)               //o(height * width)
+	for (int i = st_height;i < en_height; ++i)               //o(height * width)
 	{
 		if (rgb_sum(i, 0) != 0)           
 		{
@@ -76,7 +76,7 @@ void fillRunVectors(IMAGEDATA* imagedata, int& NumberOfRuns, std::vector<int>& s
 }
 
 void firstPass(std::vector<int>& stRun, std::vector<int>& enRun, std::vector<int>& rowRun, int NumberOfRuns,
-	std::vector<int>& runLabels, std::vector<std::pair<int, int>>& equivalences, int offset)
+	std::vector<int>& runLabels, std::vector<std::pair<int, int>>& equivalences, int offset, int lastLabel)
 {
 	runLabels.assign(NumberOfRuns, 0);
 	int idxLabel = 1;
@@ -97,13 +97,13 @@ void firstPass(std::vector<int>& stRun, std::vector<int>& enRun, std::vector<int
 		{
 			if (stRun[i] <= enRun[j] + offset && enRun[i] >= stRun[j] - offset && rowRun[i] == rowRun[j] + 1)
 			{
-				if (runLabels[i] == 0) // Ã»ÓĞ±»±êºÅ¹ı
+				if (runLabels[i] == 0) // æ²¡æœ‰è¢«æ ‡å·è¿‡
 					runLabels[i] = runLabels[j];
-				else if (runLabels[i] != runLabels[j])// ÒÑ¾­±»±êºÅ             
-					equivalences.push_back(std::make_pair(runLabels[i], runLabels[j])); // ±£´æµÈ¼Û¶Ô
+				else if (runLabels[i] != runLabels[j])// å·²ç»è¢«æ ‡å·             
+					equivalences.push_back(std::make_pair(runLabels[i], runLabels[j])); // ä¿å­˜ç­‰ä»·å¯¹
 			}
 		}
-		if (runLabels[i] == 0) // Ã»ÓĞÓëÇ°Ò»ÁĞµÄÈÎºÎrunÖØºÏ
+		if (runLabels[i] == 0) // æ²¡æœ‰ä¸å‰ä¸€åˆ—çš„ä»»ä½•runé‡åˆ
 		{
 			//std::cout << "enter here" << std::endl;
 			runLabels[i] = idxLabel++;
@@ -120,7 +120,7 @@ void replaceSameLabel(std::vector<int>& runLabels, std::vector<std::pair<int, in
 	int maxLabel = *max_element(runLabels.begin(), runLabels.end());
 	std::vector<std::vector<bool>> eqTab(maxLabel, std::vector<bool>(maxLabel, false));
 	std::vector<std::pair<int, int>>::iterator vecPairIt = equivalence.begin();
-	while (vecPairIt != equivalence.end()) //ÎŞÏòÍ¼ÁÚ½Ó¾ØÕó
+	while (vecPairIt != equivalence.end()) //æ— å‘å›¾é‚»æ¥çŸ©é˜µ
 	{
 		eqTab[vecPairIt->first - 1][vecPairIt->second - 1] = true;
 		eqTab[vecPairIt->second - 1][vecPairIt->first - 1] = true;
@@ -142,14 +142,14 @@ void replaceSameLabel(std::vector<int>& runLabels, std::vector<std::pair<int, in
 		{
 			for (std::vector<bool>::size_type k = 0; k != eqTab[tempList[j] - 1].size(); k++)
 			{
-				if (eqTab[tempList[j] - 1][k] && !labelFlag[k]) //!labelFlag[k] ·ÀÖ¹ÖØ¸´Ìí¼ÓÏàÍ¬
+				if (eqTab[tempList[j] - 1][k] && !labelFlag[k]) //!labelFlag[k] é˜²æ­¢é‡å¤æ·»åŠ ç›¸åŒ
 				{
-					tempList.push_back(k + 1);              //½«µÚkºÅÌí¼Óµ½listÖĞ£¬ÓÉÓÚ±êºÅ´Ó1¿ªÊ¼£¬push k+1
-					labelFlag[k] = equaList.size() + 1;		//ÖÃÎ»labelflag[k]£¬²¢ÇÒÏàÍ¬ĞĞµÄkth run ¶¼ÓĞÏàÍ¬µÄÊıÖµ
+					tempList.push_back(k + 1);              //å°†ç¬¬kå·æ·»åŠ åˆ°listä¸­ï¼Œç”±äºæ ‡å·ä»1å¼€å§‹ï¼Œpush k+1
+					labelFlag[k] = equaList.size() + 1;		//ç½®ä½labelflag[k]ï¼Œå¹¶ä¸”ç›¸åŒè¡Œçš„kth run éƒ½æœ‰ç›¸åŒçš„æ•°å€¼
 				}
 			}
 		}
-		equaList.push_back(tempList);                       //Ò»ÌõÁ¬½ÓÇøÓòÍê³É£¬Ìí¼Óµ½equallistÖĞ
+		equaList.push_back(tempList);                       //ä¸€æ¡è¿æ¥åŒºåŸŸå®Œæˆï¼Œæ·»åŠ åˆ°equallistä¸­
 		tempList.clear();									// clear templist, do the next 
 	}
 	std::cout << "connected regions: " << equaList.size() << std::endl; // numbers of the connect regions
@@ -164,14 +164,14 @@ void connect(IMAGEDATA* imagedata)
 {
 	int NumberOfRuns = 0;
 	std::vector<int> stRun, enRun, rowRun;
-	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun);
 	std::vector<int> runLabels;
 	std::vector<std::pair<int, int>> equivalences;
 	int offset = 1; //1 8-n; 0 4-n
-	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
+
+	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun ,0 ,height / 2);
+	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset,1);
 	replaceSameLabel(runLabels, equivalences);
 	for (int i = 0; i < runLabels.size(); ++i)
-	{
 		for (int j = stRun[i]; j < enRun[i]; ++j)
 		{
 			int rgb = runLabels[i] * 20 > 256 ? 200 : runLabels[i] * 20;
@@ -179,9 +179,53 @@ void connect(IMAGEDATA* imagedata)
 			(*(imagedata + rowRun[i] * width + j)).green = rgb * 0.59 * runLabels[i];
 			(*(imagedata + rowRun[i] * width + j)).blue = rgb * 0.11 * runLabels[i];
 		}
+
+	std::vector<int> stRun1, enRun1;   //ä¿å­˜æœ€åä¸€è¡Œçš„ä¿¡æ¯
+	int rowRun1;
+	std::vector<int> runLabels1;
+	int tempRuns = 0;
+	rowRun1 = (*(rowRun.end() - 1 ));
+	for (auto i = 0; i != rowRun.size(); ++i)
+	{
+		if (rowRun[i] == rowRun1)
+		{
+			tempRuns++;
+			stRun1.push_back(stRun[i]); //è®°å½•ä¸Šéƒ¨åˆ†æœ€åä¸€è¡Œçš„ä¿¡æ¯
+			enRun1.push_back(enRun[i]);
+			runLabels1.push_back(runLabels[i]);
+		}
 	}
 
+	NumberOfRuns = 0; stRun.clear(); enRun.clear(); rowRun.clear(); equivalences.clear(); runLabels.clear(); //clear
+
+	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 2, height);
+	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset, runLabels1[0]);
+	replaceSameLabel(runLabels, equivalences);
+	for(int i = 0; rowRun[i] == height / 2; ++i)
+		for (int j = 0; j < tempRuns; ++j)
+		{
+			if (stRun[i] <= enRun1[j] + offset && enRun[i] >= stRun1[j] - offset/* && rowRun[i] == rowRun[j] + 1*/)
+			{
+				for (int k = 0; k != runLabels.size(); ++k)
+				{
+					if(runLabels[k] == runLabels[i])
+						runLabels[k] = runLabels1[j];
+				}
+			}
+		}
+	
+
+	for (int i = 0; i < runLabels.size(); ++i)
+		for (int j = stRun[i]; j < enRun[i]; ++j)
+		{
+			int rgb = runLabels[i] * 20 > 256 ? 200 : runLabels[i] * 20;
+			(*(imagedata + rowRun[i] * width + j)).red = rgb * 0.3 * runLabels[i];
+			(*(imagedata + rowRun[i] * width + j)).green = rgb * 0.59 * runLabels[i];
+			(*(imagedata + rowRun[i] * width + j)).blue = rgb * 0.11 * runLabels[i];
+		}
+	NumberOfRuns = 0; stRun.clear(); enRun.clear(); rowRun.clear(); equivalences.clear();
 }
+
 
 //void floodfill(IMAGEDATA* imagedata, int x, int y, int oldcolor, int newcolor)
 //{
