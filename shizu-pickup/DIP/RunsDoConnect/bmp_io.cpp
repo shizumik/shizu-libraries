@@ -4,7 +4,7 @@
 
 BITMAPFILEHEADER strHead;
 BITMAPINFOHEADER strInfo;
-WORD strRGB; // two-value picture  62 - 54 = 8
+WORD *strRGB; // two-value picture  62 - 54 = 8
 int width, height;
 
 IMAGEDATA* LoadBMP()
@@ -26,21 +26,22 @@ IMAGEDATA* LoadBMP()
 		fread(&strHead, sizeof(tagBITMAPFILEHEADER), 1, fpi);
 		fread(&strInfo, sizeof(tagBITMAPINFOHEADER), 1, fpi);
 		//showBmpHead(strHead);
-		//showBmpInforHead(strInfo);
+	    //showBmpInforHead(strInfo);
 		width = strInfo.biWidth;
 		height = strInfo.biHeight;
 		if (strInfo.biBitCount == 1)
 		{
 			fread(&strRGB, sizeof(WORD), 1, fpi);
-			
-			width = 5120;
+			//width = 5120;
+			if (width % 32)
+				width = (width / 32 + 1) * 32;
 
 			BYTE *imgdata = new BYTE[width * height / 8];           //1bit/pixel
-			//std::cout << width;
+																	//std::cout << width;
 			for (int i = 0; i < width * height / 8; ++i)
 				*(imgdata + i) = 0;
 
-			fread(imgdata, sizeof(BYTE) * width / 8, height , fpi);
+			fread(imgdata, sizeof(BYTE) * width / 8, height, fpi);
 			fclose(fpi);
 			IMAGEDATA *imagedata = new IMAGEDATA[width * height];    //24bit/pixel
 			int count = 0, k = 0;
@@ -63,6 +64,32 @@ IMAGEDATA* LoadBMP()
 			delete[] imgdata;
 			return imagedata;
 		}
+		else if (strInfo.biBitCount == 8)
+		{
+			BYTE *temp = new BYTE[1024];
+			fread(temp, sizeof(BYTE), 1024, fpi);   //1024
+			delete[] temp;
+
+			BYTE *imgdata = new BYTE[width * height];           //1byte/pixel
+			for (int i = 0; i < width * height; ++i)
+				*(imgdata + i) = 0;
+
+			fread(imgdata, sizeof(BYTE) * width, height, fpi);
+			fclose(fpi);
+
+			IMAGEDATA *imagedata = new IMAGEDATA[width * height];    //24bit/pixel
+			//int count = 0, k = 0;
+			for (int i = 0; i < height; ++i)
+				for (int j = 0; j < width; ++j)
+				{
+					(*(imagedata + i * width + j)).blue = (*(imagedata + i * width + j)).green
+						= (*(imagedata + i * width + j)).red = *(imgdata + i * width + j);
+		
+
+				}
+			delete[] imgdata;
+			return imagedata;
+		}
 		else if (strInfo.biBitCount == 24)
 		{
 			IMAGEDATA *imagedata = new IMAGEDATA[width * height];
@@ -70,6 +97,7 @@ IMAGEDATA* LoadBMP()
 			fclose(fpi);
 			return imagedata;
 		}
+	
 	}
 	else
 	{
@@ -115,25 +143,24 @@ int SaveBMP(IMAGEDATA* imagedata)
 }
 
 void showBmpHead(BITMAPFILEHEADER pBmpHead) {
-	std::cout << "Î»Í¼ÎÄ¼þÍ·:" << std::endl;
-	std::cout << "ÎÄ¼þ´óÐ¡:" << pBmpHead.bfSize << std::endl;
-	std::cout << "±£Áô×Ö_1:" << pBmpHead.bfReserved1 << std::endl;
-	std::cout << "±£Áô×Ö_2:" << pBmpHead.bfReserved2 << std::endl;
-	std::cout << "Êµ¼ÊÎ»Í¼Êý¾ÝµÄÆ«ÒÆ×Ö½ÚÊý:" << pBmpHead.bfOffBits << std::endl << std::endl;
+	std::cout << "ä½å›¾æ–‡ä»¶å¤´:" << std::endl;
+	std::cout << "æ–‡ä»¶å¤§å°:" << pBmpHead.bfSize << std::endl;
+	std::cout << "ä¿ç•™å­—_1:" << pBmpHead.bfReserved1 << std::endl;
+	std::cout << "ä¿ç•™å­—_2:" << pBmpHead.bfReserved2 << std::endl;
+	std::cout << "å®žé™…ä½å›¾æ•°æ®çš„åç§»å­—èŠ‚æ•°:" << pBmpHead.bfOffBits << std::endl << std::endl;
 }
 
 void showBmpInforHead(tagBITMAPINFOHEADER pBmpInforHead) {
-	std::cout << "Î»Í¼ÐÅÏ¢Í·:" << std::endl;
-	std::cout << "½á¹¹ÌåµÄ³¤¶È:" << pBmpInforHead.biSize << std::endl;
-	std::cout << "Î»Í¼¿í:" << pBmpInforHead.biWidth << std::endl;
-	std::cout << "Î»Í¼¸ß:" << pBmpInforHead.biHeight << std::endl;
-	std::cout << "biPlanesÆ½ÃæÊý:" << pBmpInforHead.biPlanes << std::endl;
-	std::cout << "biBitCount²ÉÓÃÑÕÉ«Î»Êý:" << pBmpInforHead.biBitCount << std::endl;
-	std::cout << "Ñ¹Ëõ·½Ê½:" << pBmpInforHead.biCompression << std::endl;
-	std::cout << "biSizeImageÊµ¼ÊÎ»Í¼Êý¾ÝÕ¼ÓÃµÄ×Ö½ÚÊý:" << pBmpInforHead.biSizeImage << std::endl;
-	std::cout << "X·½Ïò·Ö±æÂÊ:" << pBmpInforHead.biXPelsPerMeter << std::endl;
-	std::cout << "Y·½Ïò·Ö±æÂÊ:" << pBmpInforHead.biYPelsPerMeter << std::endl;
-	std::cout << "Ê¹ÓÃµÄÑÕÉ«Êý:" << pBmpInforHead.biClrUsed << std::endl;
-	std::cout << "ÖØÒªÑÕÉ«Êý:" << pBmpInforHead.biClrImportant << std::endl;
+	std::cout << "ä½å›¾ä¿¡æ¯å¤´:" << std::endl;
+	std::cout << "ç»“æž„ä½“çš„é•¿åº¦:" << pBmpInforHead.biSize << std::endl;
+	std::cout << "ä½å›¾å®½:" << pBmpInforHead.biWidth << std::endl;
+	std::cout << "ä½å›¾é«˜:" << pBmpInforHead.biHeight << std::endl;
+	std::cout << "biPlaneså¹³é¢æ•°:" << pBmpInforHead.biPlanes << std::endl;
+	std::cout << "biBitCounté‡‡ç”¨é¢œè‰²ä½æ•°:" << pBmpInforHead.biBitCount << std::endl;
+	std::cout << "åŽ‹ç¼©æ–¹å¼:" << pBmpInforHead.biCompression << std::endl;
+	std::cout << "biSizeImageå®žé™…ä½å›¾æ•°æ®å ç”¨çš„å­—èŠ‚æ•°:" << pBmpInforHead.biSizeImage << std::endl;
+	std::cout << "Xæ–¹å‘åˆ†è¾¨çŽ‡:" << pBmpInforHead.biXPelsPerMeter << std::endl;
+	std::cout << "Yæ–¹å‘åˆ†è¾¨çŽ‡:" << pBmpInforHead.biYPelsPerMeter << std::endl;
+	std::cout << "ä½¿ç”¨çš„é¢œè‰²æ•°:" << pBmpInforHead.biClrUsed << std::endl;
+	std::cout << "é‡è¦é¢œè‰²æ•°:" << pBmpInforHead.biClrImportant << std::endl;
 }
-
