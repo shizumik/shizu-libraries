@@ -1,14 +1,14 @@
 #pragma once
 
 #include "ProcessAlgorithms.h"
- 
+
 extern BITMAPFILEHEADER strHead;
 extern BITMAPINFOHEADER strInfo;
 extern int width, height;
 
 void Binarization(IMAGEDATA* imagedata)
 {
-	for(int i = 0; i < height; ++i)
+	for (int i = 0; i < height; ++i)
 		for (int j = 0; j < width; ++j)
 		{
 			int gray_level = (*(imagedata + i * width + j)).red * 0.3 + (*(imagedata + i * width + j)).green * 0.59
@@ -20,63 +20,15 @@ void Binarization(IMAGEDATA* imagedata)
 		}
 }
 
-void paintbmp(IMAGEDATA* imagedata, std::vector<int>& stRun,
-	std::vector<int>& enRun, std::vector<int>& rowRun, std::vector<int>& runLabels)
-{
-	for (int i = 0; i < runLabels.size(); ++i)
-		for (int j = stRun[i]; j < enRun[i]; ++j)
-		{
-			int rgb = runLabels[i] * 20 > 256 ? 200 : runLabels[i] * 20;
-			(*(imagedata + rowRun[i] * width + j)).red = rgb * 0.3 * runLabels[i];
-			(*(imagedata + rowRun[i] * width + j)).green = rgb * 0.59 * runLabels[i];
-			(*(imagedata + rowRun[i] * width + j)).blue = rgb * 0.11 * runLabels[i];
-		}
-}
 
-void union_pre(std::vector<int>& stRun, std::vector<int>& enRun, std::vector<int>& rowRun, std::vector<int>& runLabels, 
-	std::vector<int>& stRun1, std::vector<int>& enRun1, std::vector<int>& runLabels1 ,int tempRuns1, int offset, int h)
-{
-	for (int i = 0; rowRun[i] == h; ++i)
-		for (int j = 0; j < tempRuns1; ++j)
-		{
-			if (stRun[i] <= enRun1[j] + offset && enRun[i] >= stRun1[j] - offset/* && rowRun[i] == rowRun[j] + 1*/)
-			{
-				int temp = runLabels[i];
-				for (int k = 0; k != runLabels.size(); ++k)
-				{
-					if (runLabels[k] == temp)
-						runLabels[k] = runLabels1[j];
-				}
-			}
-		}
-}
 
-void check_clear(std::vector<int>& stRun, std::vector<int>& enRun, std::vector<int>& rowRun,
-	std::vector<int>& runLabels, std::vector<std::pair<int, int>>& equivalences
-	, std::vector<int>& stRun1, std::vector<int>& enRun1, std::vector<int>& runLabels1, 
-	int &tempRuns1, int &NumberOfRuns, int &rowRun1)
-{
-	stRun1.clear(); enRun1.clear(); runLabels1.clear(); tempRuns1 = 0;// clear the last last info
-	rowRun1 = (*(rowRun.end() - 1));
-	for (auto i = 0; i != NumberOfRuns; ++i)
-	{
-		if (rowRun[i] == rowRun1)
-		{
-			tempRuns1++;
-			stRun1.push_back(stRun[i]);
-			enRun1.push_back(enRun[i]);
-			runLabels1.push_back(runLabels[i]);
-		}
-	}
-	NumberOfRuns = 0; stRun.clear(); enRun.clear(); rowRun.clear(); equivalences.clear(); runLabels.clear();
-}
 void fillRunVectors(IMAGEDATA* imagedata, int& NumberOfRuns, std::vector<int>& stRun,
 	std::vector<int>& enRun, std::vector<int>& rowRun, int st_height, int en_height)
 {
-	#define rgb_sum(i,j) ((*(imagedata + i * width + j)).red + (*(imagedata + i * width + j)).green + (*(imagedata + i * width + j)).blue)
-	for (int i = st_height;i < en_height; ++i)               //o(height * width)
+#define rgb_sum(i,j) ((*(imagedata + i * width + j)).red + (*(imagedata + i * width + j)).green + (*(imagedata + i * width + j)).blue)
+	for (int i = st_height; i < en_height; ++i)               //o(height * width)
 	{
-		if (rgb_sum(i, 0) != 0)           
+		if (rgb_sum(i, 0) != 0)
 		{
 			NumberOfRuns++;
 			stRun.push_back(0);
@@ -92,11 +44,11 @@ void fillRunVectors(IMAGEDATA* imagedata, int& NumberOfRuns, std::vector<int>& s
 			}
 			else if (rgb_sum(i, j - 1) != 0 && rgb_sum(i, j) == 0)
 			{
-				enRun.push_back(j);   
+				enRun.push_back(j);
 			}
 
 		}
-		if (rgb_sum(i, width - 1))        
+		if (rgb_sum(i, width - 1))
 		{
 			enRun.push_back(width - 1);
 		}
@@ -127,13 +79,13 @@ void firstPass(std::vector<int>& stRun, std::vector<int>& enRun, std::vector<int
 		{
 			if (stRun[i] <= enRun[j] + offset && enRun[i] >= stRun[j] - offset && rowRun[i] == rowRun[j] + 1)
 			{
-				if (runLabels[i] == 0) 
+				if (runLabels[i] == 0)
 					runLabels[i] = runLabels[j];
-				else if (runLabels[i] != runLabels[j])        
-					equivalences.push_back(std::make_pair(runLabels[i], runLabels[j])); 
+				else if (runLabels[i] != runLabels[j])
+					equivalences.push_back(std::make_pair(runLabels[i], runLabels[j]));
 			}
 		}
-		if (runLabels[i] == 0) 
+		if (runLabels[i] == 0)
 		{
 			//std::cout << "enter here" << std::endl;
 			runLabels[i] = idxLabel++;
@@ -150,7 +102,7 @@ void replaceSameLabel(std::vector<int>& runLabels, std::vector<std::pair<int, in
 	int maxLabel = *max_element(runLabels.begin(), runLabels.end());
 	std::vector<std::vector<bool>> eqTab(maxLabel, std::vector<bool>(maxLabel, false));
 	std::vector<std::pair<int, int>>::iterator vecPairIt = equivalence.begin();
-	while (vecPairIt != equivalence.end()) 
+	while (vecPairIt != equivalence.end())
 	{
 		eqTab[vecPairIt->first - 1][vecPairIt->second - 1] = true;
 		eqTab[vecPairIt->second - 1][vecPairIt->first - 1] = true;
@@ -168,18 +120,18 @@ void replaceSameLabel(std::vector<int>& runLabels, std::vector<std::pair<int, in
 		}
 		labelFlag[i - 1] = equaList.size() + 1;
 		tempList.push_back(i);
-		for (std::vector<int>::size_type j = 0; j < tempList.size(); j++)  
+		for (std::vector<int>::size_type j = 0; j < tempList.size(); j++)
 		{
 			for (std::vector<bool>::size_type k = 0; k != eqTab[tempList[j] - 1].size(); k++)
 			{
-				if (eqTab[tempList[j] - 1][k] && !labelFlag[k]) 
+				if (eqTab[tempList[j] - 1][k] && !labelFlag[k])
 				{
-					tempList.push_back(k + 1);              
-					labelFlag[k] = equaList.size() + 1;		
+					tempList.push_back(k + 1);
+					labelFlag[k] = equaList.size() + 1;
 				}
 			}
 		}
-		equaList.push_back(tempList);                       
+		equaList.push_back(tempList);
 		tempList.clear();									// clear templist, do the next 
 	}
 	//std::cout << "connected regions: " << equaList.size() << std::endl; // numbers of the connect regions
@@ -190,6 +142,74 @@ void replaceSameLabel(std::vector<int>& runLabels, std::vector<std::pair<int, in
 	//std::cout << "runLabels numbers: " << runLabels.size() << std::endl;
 }
 
+void paintbmp(IMAGEDATA* imagedata, std::vector<int>& stRun,
+	std::vector<int>& enRun, std::vector<int>& rowRun, std::vector<int>& runLabels)
+{
+	for (int i = 0; i < runLabels.size(); ++i)
+		for (int j = stRun[i]; j < enRun[i]; ++j)
+		{
+			int rgb = runLabels[i] * 20 > 256 ? 200 : runLabels[i] * 20;
+			(*(imagedata + rowRun[i] * width + j)).red = rgb * 0.3 * runLabels[i];
+			(*(imagedata + rowRun[i] * width + j)).green = rgb * 0.59 * runLabels[i];
+			(*(imagedata + rowRun[i] * width + j)).blue = rgb * 0.11 * runLabels[i];
+		}
+}
+
+void union_pre(std::vector<int>& stRun, std::vector<int>& enRun, std::vector<int>& rowRun, std::vector<int>& runLabels,
+	std::vector<int>& stRun1, std::vector<int>& enRun1, std::vector<int>& runLabels1, int tempRuns1, int offset, int h)
+{
+	for (int i = 0; rowRun[i] == h; ++i)
+		for (int j = 0; j < tempRuns1; ++j)
+		{
+			if (stRun[i] <= enRun1[j] + offset && enRun[i] >= stRun1[j] - offset/* && rowRun[i] == rowRun[j] + 1*/)
+			{
+				int temp = runLabels[i];
+				for (int k = 0; k != runLabels.size(); ++k)
+				{
+					if (runLabels[k] == temp)
+						runLabels[k] = runLabels1[j];
+				}
+			}
+		}
+}
+
+void check_clear(std::vector<int>& stRun, std::vector<int>& enRun, std::vector<int>& rowRun,
+	std::vector<int>& runLabels, std::vector<std::pair<int, int>>& equivalences
+	, std::vector<int>& stRun1, std::vector<int>& enRun1, std::vector<int>& runLabels1,
+	int &tempRuns1, int &NumberOfRuns, int &rowRun1)
+{
+	stRun1.clear(); enRun1.clear(); runLabels1.clear(); tempRuns1 = 0;// clear the last last info
+	rowRun1 = (*(rowRun.end() - 1));
+	for (auto i = 0; i != NumberOfRuns; ++i)
+	{
+		if (rowRun[i] == rowRun1)
+		{
+			tempRuns1++;
+			stRun1.push_back(stRun[i]);
+			enRun1.push_back(enRun[i]);
+			runLabels1.push_back(runLabels[i]);
+		}
+	}
+	NumberOfRuns = 0; stRun.clear(); enRun.clear(); rowRun.clear(); equivalences.clear(); runLabels.clear();
+}
+
+
+void dosth(IMAGEDATA* imagedata, std::vector<int>& stRun, std::vector<int>& enRun, std::vector<int>& rowRun,
+	std::vector<int>& runLabels, std::vector<std::pair<int, int>>& equivalences
+	, std::vector<int>& stRun1, std::vector<int>& enRun1, std::vector<int>& runLabels1,
+	int &tempRuns1, int &NumberOfRuns, int &rowRun1, int& offset, int slice)
+{
+	for (int i = 1; i < slice - 1; ++i)
+	{
+		fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / slice * i, height / slice * (i + 1));
+		firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
+		replaceSameLabel(runLabels, equivalences);
+		union_pre(stRun, enRun, rowRun, runLabels, stRun1, enRun1, runLabels1, tempRuns1, offset, height / slice * i);
+		paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
+
+		check_clear(stRun, enRun, rowRun, runLabels, equivalences, stRun1, enRun1, runLabels1, tempRuns1, NumberOfRuns, rowRun1);
+	}
+}
 void connect(IMAGEDATA* imagedata)
 {
 	int NumberOfRuns = 0;
@@ -197,17 +217,18 @@ void connect(IMAGEDATA* imagedata)
 	std::vector<int> runLabels;
 	std::vector<std::pair<int, int>> equivalences;
 	int offset = 1; //1 8-n; 0 4-n
-
-	/*************height: 0 ----------------------- height / 20******************/
-	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, 0, height / 20);
-	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
-	replaceSameLabel(runLabels, equivalences);
-	paintbmp(imagedata,stRun, enRun, rowRun, runLabels);
-
-	std::vector<int> stRun1 , enRun1;
+	std::vector<int> stRun1, enRun1;
 	int rowRun1;
 	std::vector<int> runLabels1;
 	int tempRuns1 = 0;
+	int slice;
+	slice = 25;
+
+	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, 0, height / slice);
+	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
+	replaceSameLabel(runLabels, equivalences);
+	paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
+
 	//check_clear(stRun, enRun, rowRun, runLabels, equivalences, stRun1, enRun1, runLabels1, tempRuns1, NumberOfRuns, rowRun1);
 	rowRun1 = (*(rowRun.end() - 1));
 	for (auto i = 0; i != NumberOfRuns; ++i)
@@ -215,180 +236,117 @@ void connect(IMAGEDATA* imagedata)
 		if (rowRun[i] == rowRun1)
 		{
 			tempRuns1++;
-			stRun1.push_back(stRun[i]); 
+			stRun1.push_back(stRun[i]);
 			enRun1.push_back(enRun[i]);
 			runLabels1.push_back(runLabels[i]);
 		}
 	}
 	NumberOfRuns = 0; stRun.clear(); enRun.clear(); rowRun.clear(); equivalences.clear(); runLabels.clear(); //clear
 
-	/*************height: height / 20 ----------------------- height / 20 * 2******************/
-	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 20, height / 20 * 2);
+	//fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 12, height / 12 * 2);
+	//firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
+	//replaceSameLabel(runLabels, equivalences);
+	//union_pre(stRun, enRun, rowRun, runLabels, stRun1, enRun1, runLabels1, tempRuns1, offset, height / 12);
+	//paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
+
+	//check_clear(stRun, enRun, rowRun, runLabels, equivalences, stRun1, enRun1, runLabels1, tempRuns1, NumberOfRuns, rowRun1);
+
+	//fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 12 * 2, height / 12 * 3);
+	//firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
+	//replaceSameLabel(runLabels, equivalences);
+	//union_pre(stRun, enRun, rowRun, runLabels, stRun1, enRun1, runLabels1, tempRuns1, offset, height / 12 * 2);
+	//paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
+
+	//check_clear(stRun, enRun, rowRun, runLabels, equivalences, stRun1, enRun1, runLabels1, tempRuns1, NumberOfRuns, rowRun1);
+
+	//fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 12 * 3, height / 12 * 4);
+	//firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
+	//replaceSameLabel(runLabels, equivalences);
+	//union_pre(stRun, enRun, rowRun, runLabels, stRun1, enRun1, runLabels1, tempRuns1, offset, height / 12 * 3);
+	//paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
+
+	//check_clear(stRun, enRun, rowRun, runLabels, equivalences, stRun1, enRun1, runLabels1, tempRuns1, NumberOfRuns, rowRun1);
+
+	//fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 12 * 4, height / 12 * 5);
+	//firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
+	//replaceSameLabel(runLabels, equivalences);
+	//union_pre(stRun, enRun, rowRun, runLabels, stRun1, enRun1, runLabels1, tempRuns1, offset, height / 12 * 4);
+	////for (int i = 0; rowRun[i] == height / 12 * 4; ++i)
+	////	for (int j = 0; j < tempRuns1; ++j)
+	////	{
+	////		if (stRun[i] <= enRun1[j] + offset && enRun[i] >= stRun1[j] - offset/* && rowRun[i] == rowRun[j] + 1*/)
+	////		{
+	////			int temp = runLabels[i];
+	////			for (int k = 0; k != runLabels.size(); ++k)
+	////			{
+	////				if (runLabels[k] == temp)
+	////					runLabels[k] = runLabels1[j];
+	////			}
+	////		}
+	////	}
+	//paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
+
+	//check_clear(stRun, enRun, rowRun, runLabels, equivalences, stRun1, enRun1, runLabels1, tempRuns1, NumberOfRuns, rowRun1);
+
+	//fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 12 * 5, height / 12 * 6);
+	//firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
+	//replaceSameLabel(runLabels, equivalences);
+	//union_pre(stRun, enRun, rowRun, runLabels, stRun1, enRun1, runLabels1, tempRuns1, offset, height / 12 * 5);
+	//paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
+
+	//check_clear(stRun, enRun, rowRun, runLabels, equivalences, stRun1, enRun1, runLabels1, tempRuns1, NumberOfRuns, rowRun1);
+
+	//fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 12 * 6, height / 12 * 7);
+	//firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
+	//replaceSameLabel(runLabels, equivalences);
+	//union_pre(stRun, enRun, rowRun, runLabels, stRun1, enRun1, runLabels1, tempRuns1, offset, height / 12 * 6);
+	//paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
+
+	//check_clear(stRun, enRun, rowRun, runLabels, equivalences, stRun1, enRun1, runLabels1, tempRuns1, NumberOfRuns, rowRun1);
+
+	//fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 12 * 7, height / 12 * 8);
+	//firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
+	//replaceSameLabel(runLabels, equivalences);
+	//union_pre(stRun, enRun, rowRun, runLabels, stRun1, enRun1, runLabels1, tempRuns1, offset, height / 12 * 7);
+	//paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
+
+	//check_clear(stRun, enRun, rowRun, runLabels, equivalences, stRun1, enRun1, runLabels1, tempRuns1, NumberOfRuns, rowRun1);
+
+	//fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 12 * 8, height / 12 * 9);
+	//firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
+	//replaceSameLabel(runLabels, equivalences);
+	//union_pre(stRun, enRun, rowRun, runLabels, stRun1, enRun1, runLabels1, tempRuns1, offset, height / 12 * 8);
+	//paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
+
+	//check_clear(stRun, enRun, rowRun, runLabels, equivalences, stRun1, enRun1, runLabels1, tempRuns1, NumberOfRuns, rowRun1);
+
+	//fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 12 * 9, height / 12 * 10);
+	//firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
+	//replaceSameLabel(runLabels, equivalences);
+	//union_pre(stRun, enRun, rowRun, runLabels, stRun1, enRun1, runLabels1, tempRuns1, offset, height / 12 * 9);
+	//paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
+
+	//check_clear(stRun, enRun, rowRun, runLabels, equivalences, stRun1, enRun1, runLabels1, tempRuns1, NumberOfRuns, rowRun1);
+
+	//fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 12 * 10, height / 12 * 11);
+	//firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
+	//replaceSameLabel(runLabels, equivalences);
+	//union_pre(stRun, enRun, rowRun, runLabels, stRun1, enRun1, runLabels1, tempRuns1, offset, height / 12 * 10);
+	//paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
+
+	//check_clear(stRun, enRun, rowRun, runLabels, equivalences, stRun1, enRun1, runLabels1, tempRuns1, NumberOfRuns, rowRun1);
+
+	dosth(imagedata, stRun, enRun, rowRun, runLabels, equivalences,  
+		stRun1, enRun1, runLabels1, tempRuns1, NumberOfRuns, rowRun1, offset, slice);
+	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / slice * (slice-1), height);
 	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
 	replaceSameLabel(runLabels, equivalences);
-	union_pre(stRun, enRun, rowRun, runLabels,stRun1, enRun1, runLabels1, tempRuns1, offset, height / 20);
+	union_pre(stRun, enRun, rowRun, runLabels, stRun1, enRun1, runLabels1, tempRuns1, offset, height / slice * (slice - 1));
 	paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
 
-	check_clear(stRun, enRun, rowRun, runLabels, equivalences, stRun1, enRun1, runLabels1, tempRuns1, NumberOfRuns, rowRun1);
-
-	/*************height: height / 20 * 2 ----------------------- height / 20 * 3******************/
-	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 20 * 2, height / 20 * 3);
-	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
-	replaceSameLabel(runLabels, equivalences);	
-	union_pre(stRun, enRun, rowRun, runLabels, stRun1, enRun1, runLabels1, tempRuns1, offset, height / 20 * 2);
-	paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
-	
-	check_clear(stRun, enRun, rowRun, runLabels, equivalences, stRun1, enRun1, runLabels1, tempRuns1, NumberOfRuns, rowRun1);
-	
-	/*************height: height / 20 * 3 ----------------------- height / 20 * 4******************/
-	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 20 * 3, height / 20 * 4);
-	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
-	replaceSameLabel(runLabels, equivalences);	
-	union_pre(stRun, enRun, rowRun, runLabels, stRun1, enRun1, runLabels1, tempRuns1, offset, height / 20 * 3);
-	paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
-	
-	check_clear(stRun, enRun, rowRun, runLabels, equivalences, stRun1, enRun1, runLabels1, tempRuns1, NumberOfRuns, rowRun1);
-	
-	/*************height: height / 20 * 4 ----------------------- height / 20 * 5******************/
-	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 20 * 4, height / 20 * 5);
-	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
-	replaceSameLabel(runLabels, equivalences);	
-	union_pre(stRun, enRun, rowRun, runLabels, stRun1, enRun1, runLabels1, tempRuns1, offset, height / 20 * 4);
-	paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
-	
-	check_clear(stRun, enRun, rowRun, runLabels, equivalences, stRun1, enRun1, runLabels1, tempRuns1, NumberOfRuns, rowRun1);
-	
-	/*************height: height / 20 * 5----------------------- height / 20 * 6******************/
-	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 20 * 5, height / 20 * 6);
-	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
-	replaceSameLabel(runLabels, equivalences);
-	union_pre(stRun, enRun, rowRun, runLabels, stRun1, enRun1, runLabels1, tempRuns1, offset, height /20 * 5);
-	paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
-	
-	check_clear(stRun, enRun, rowRun, runLabels, equivalences, stRun1, enRun1, runLabels1, tempRuns1, NumberOfRuns, rowRun1);
-	
-	/*************height: height / 20 * 6 ----------------------- height / 20 * 7******************/
-	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 20 * 6, height / 20 * 7);
-	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
-	replaceSameLabel(runLabels, equivalences);
-	union_pre(stRun, enRun, rowRun, runLabels, stRun1, enRun1, runLabels1, tempRuns1, offset, height / 20 * 6);
-	paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
-	
-	check_clear(stRun, enRun, rowRun, runLabels, equivalences, stRun1, enRun1, runLabels1, tempRuns1, NumberOfRuns, rowRun1);
-	
-	/*************height: height / 20 * 7 ----------------------- height / 20 * 8******************/
-	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 20 * 7, height / 20 * 8);
-	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
-	replaceSameLabel(runLabels, equivalences);
-	union_pre(stRun, enRun, rowRun, runLabels, stRun1, enRun1, runLabels1, tempRuns1, offset, height / 20 * 7);
-	paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
-
-	check_clear(stRun, enRun, rowRun, runLabels, equivalences, stRun1, enRun1, runLabels1, tempRuns1, NumberOfRuns, rowRun1);
-	
-	/*************height: height / 20 * 8 ----------------------- height / 20 * 9******************/
-	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 20 * 8, height / 20 * 9);
-	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
-	replaceSameLabel(runLabels, equivalences);
-	union_pre(stRun, enRun, rowRun, runLabels, stRun1, enRun1, runLabels1, tempRuns1, offset, height / 20 * 8);
-	paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
-
-	check_clear(stRun, enRun, rowRun, runLabels, equivalences, stRun1, enRun1, runLabels1, tempRuns1, NumberOfRuns, rowRun1);
-	
-	/*************height: height / 20 * 9----------------------- height / 20 * 10******************/
-	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 20 * 9, height / 20 * 10);
-	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
-	replaceSameLabel(runLabels, equivalences);
-	union_pre(stRun, enRun, rowRun, runLabels, stRun1, enRun1, runLabels1, tempRuns1, offset, height / 20 * 9);
-	paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
-	/*************height: height / 20 * 10 ----------------------- height / 20 * 11******************/
-	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 20 * 10, height / 20 * 11);
-	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
-	replaceSameLabel(runLabels, equivalences);
-	union_pre(stRun, enRun, rowRun, runLabels, stRun1, enRun1, runLabels1, tempRuns1, offset, height / 20 * 10);
-	paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
-
-	check_clear(stRun, enRun, rowRun, runLabels, equivalences, stRun1, enRun1, runLabels1, tempRuns1, NumberOfRuns, rowRun1);
-
-	/*************height: height / 20 * 11 ----------------------- height / 20 * 12******************/
-	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 20 * 11, height / 20 * 12);
-	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
-	replaceSameLabel(runLabels, equivalences);
-	union_pre(stRun, enRun, rowRun, runLabels, stRun1, enRun1, runLabels1, tempRuns1, offset, height / 20 * 11);
-	paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
-
-	check_clear(stRun, enRun, rowRun, runLabels, equivalences, stRun1, enRun1, runLabels1, tempRuns1, NumberOfRuns, rowRun1);
-
-	/*************height: height / 20 * 12 ----------------------- height / 20 * 13******************/
-	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 20 * 12, height / 20 * 13);
-	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
-	replaceSameLabel(runLabels, equivalences);
-	union_pre(stRun, enRun, rowRun, runLabels, stRun1, enRun1, runLabels1, tempRuns1, offset, height / 20 * 12);
-	paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
-
-	check_clear(stRun, enRun, rowRun, runLabels, equivalences, stRun1, enRun1, runLabels1, tempRuns1, NumberOfRuns, rowRun1);
-
-	/*************height: height / 20 * 13 ----------------------- height / 20 * 14******************/
-	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 20 * 13, height / 20 * 14);
-	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
-	replaceSameLabel(runLabels, equivalences);
-	union_pre(stRun, enRun, rowRun, runLabels, stRun1, enRun1, runLabels1, tempRuns1, offset, height / 20 * 13);
-	paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
-
-	check_clear(stRun, enRun, rowRun, runLabels, equivalences, stRun1, enRun1, runLabels1, tempRuns1, NumberOfRuns, rowRun1);
-
-	/*************height: height / 20 * 14----------------------- height / 20 * 15******************/
-	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 20 * 14, height / 20 * 15);
-	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
-	replaceSameLabel(runLabels, equivalences);
-	union_pre(stRun, enRun, rowRun, runLabels, stRun1, enRun1, runLabels1, tempRuns1, offset, height / 20 * 14);
-	paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
-
-	check_clear(stRun, enRun, rowRun, runLabels, equivalences, stRun1, enRun1, runLabels1, tempRuns1, NumberOfRuns, rowRun1);
-
-	/*************height: height / 20 * 15 ----------------------- height / 20 * 16******************/
-	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 20 * 15, height / 20 * 16);
-	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
-	replaceSameLabel(runLabels, equivalences);
-	union_pre(stRun, enRun, rowRun, runLabels, stRun1, enRun1, runLabels1, tempRuns1, offset, height / 20 * 15);
-	paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
-
-	check_clear(stRun, enRun, rowRun, runLabels, equivalences, stRun1, enRun1, runLabels1, tempRuns1, NumberOfRuns, rowRun1);
-
-	/*************height: height / 20 * 16 ----------------------- height / 20 * 17******************/
-	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 20 * 16, height / 20 * 17);
-	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
-	replaceSameLabel(runLabels, equivalences);
-	union_pre(stRun, enRun, rowRun, runLabels, stRun1, enRun1, runLabels1, tempRuns1, offset, height / 20 * 16);
-	paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
-
-	check_clear(stRun, enRun, rowRun, runLabels, equivalences, stRun1, enRun1, runLabels1, tempRuns1, NumberOfRuns, rowRun1);
-
-	/*************height: height / 20 * 17 ----------------------- height / 20 * 18******************/
-	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 20 * 17, height / 20 * 18);
-	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
-	replaceSameLabel(runLabels, equivalences);
-	union_pre(stRun, enRun, rowRun, runLabels, stRun1, enRun1, runLabels1, tempRuns1, offset, height / 20 * 17);
-	paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
-
-	check_clear(stRun, enRun, rowRun, runLabels, equivalences, stRun1, enRun1, runLabels1, tempRuns1, NumberOfRuns, rowRun1);
-
-	/*************height: height / 20 * 18----------------------- height / 20 * 19******************/
-	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 20 * 18, height / 20 * 19);
-	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
-	replaceSameLabel(runLabels, equivalences);
-	union_pre(stRun, enRun, rowRun, runLabels, stRun1, enRun1, runLabels1, tempRuns1, offset, height / 20 * 18);
-	paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
-
-	check_clear(stRun, enRun, rowRun, runLabels, equivalences, stRun1, enRun1, runLabels1, tempRuns1, NumberOfRuns, rowRun1);
-
-	/*************height: height / 20 * 19----------------------- height******************/
-	fillRunVectors(imagedata, NumberOfRuns, stRun, enRun, rowRun, height / 20 * 19, height);
-	firstPass(stRun, enRun, rowRun, NumberOfRuns, runLabels, equivalences, offset);
-	replaceSameLabel(runLabels, equivalences);
-	union_pre(stRun, enRun, rowRun, runLabels, stRun1, enRun1, runLabels1, tempRuns1, offset, height / 20 * 19);
-	paintbmp(imagedata, stRun, enRun, rowRun, runLabels);
 	NumberOfRuns = 0; stRun.clear(); enRun.clear(); rowRun.clear(); equivalences.clear(); runLabels.clear();
 }
+
 
 //void floodfill(IMAGEDATA* imagedata, int x, int y, int oldcolor, int newcolor)
 //{
