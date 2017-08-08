@@ -1,5 +1,3 @@
-#pragma once
-#ifndef PROCESS_ALGORITHM_H
 #define PROCESS_ALGORITHM_H
 
 #include "bmp_format.h"
@@ -15,6 +13,10 @@ void check_clear(std::vector<int>& stRun, std::vector<int>& enRun, std::vector<i
 	std::vector<int>& runLabels, std::vector<std::pair<int, int>>& equivalences
 	, std::vector<int>& stRun1, std::vector<int>& enRun1, std::vector<int>& runLabels1,
 	int &tempRuns1, int &NumberOfRuns, int &rowRun1);
+void dosth(IMAGEDATA* imagedata, std::vector<int>& stRun, std::vector<int>& enRun, std::vector<int>& rowRun,
+	std::vector<int>& runLabels, std::vector<std::pair<int, int>>& equivalences
+	, std::vector<int>& stRun1, std::vector<int>& enRun1, std::vector<int>& runLabels1,
+	int &tempRuns1, int &NumberOfRuns, int &rowRun1, int& offset, int slice);
 // connect regions algorithm start
 void fillRunVectors(IMAGEDATA* imagedata, int& NumberOfRuns, std::vector<int>& stRun,
 	std::vector<int>& enRun, std::vector<int>& rowRun, int st_height, int en_height);
