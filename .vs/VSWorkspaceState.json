@@ -2,8 +2,10 @@
   "ExpandedNodes": [
     "",
     "\\shizu-pickup",
-    "\\shizu-pickup\\DIP"
+    "\\shizu-pickup\\DesignPattern",
+    "\\shizu-pickup\\DIP",
+    "\\shizu-pickup\\learnopengl"
   ],
-  "SelectedNode": "\\shizu-pickup\\DesignPattern",
+  "SelectedNode": "\\shizu-pickup\\learnopengl",
   "PreviewInSolutionExplorer": false
 }
