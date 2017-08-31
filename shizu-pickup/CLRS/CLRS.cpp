@@ -8,7 +8,7 @@ using namespace std;
 #include "insertionsort.h"
 #include "mergesort.h"
 #include "quicksort.h"
-
+#include "heapsort.h"
 void print(vector<int>& vec)
 {
 	for (auto v : vec)
@@ -23,6 +23,7 @@ int main()
 	//mergesort(vec, 0, vec.size() - 1);
 	//quicksort(vec, 0, vec.size() - 1);
 	//randomized_quicksort(vec, 0, sz - 1);
+	//heapsort(vec);
 	print(vec);
 
     return 0;
