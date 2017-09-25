@@ -1,8 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\shizu-pickup"
+    "\\shizu-pickup",
+    "\\shizu-pickup\\DIP",
+    "\\shizu-pickup\\DIP\\ShrinkImage"
   ],
-  "SelectedNode": "\\shizu-pickup",
   "PreviewInSolutionExplorer": false
 }
