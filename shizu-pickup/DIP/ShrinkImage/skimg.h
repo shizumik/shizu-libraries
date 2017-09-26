@@ -9,39 +9,39 @@ typedef unsigned short WORD;
 typedef unsigned int DWORD;
 typedef long LONG;
 
-//Î»Í¼ÎÄ¼şÍ·¶¨Òå;  
-//ÆäÖĞ²»°üº¬ÎÄ¼şÀàĞÍĞÅÏ¢£¨ÓÉÓÚ½á¹¹ÌåµÄÄÚ´æ½á¹¹¾ö¶¨£¬  
-//ÒªÊÇ¼ÓÁËµÄ»°½«²»ÄÜÕıÈ·¶ÁÈ¡ÎÄ¼şĞÅÏ¢£©  
+//ä½å›¾æ–‡ä»¶å¤´å®šä¹‰;  
+//å…¶ä¸­ä¸åŒ…å«æ–‡ä»¶ç±»å‹ä¿¡æ¯ï¼ˆç”±äºç»“æ„ä½“çš„å†…å­˜ç»“æ„å†³å®šï¼Œ  
+//è¦æ˜¯åŠ äº†çš„è¯å°†ä¸èƒ½æ­£ç¡®è¯»å–æ–‡ä»¶ä¿¡æ¯ï¼‰  
 typedef struct  tagBITMAPFILEHEADER {
-	//WORD bfType;//ÎÄ¼şÀàĞÍ£¬±ØĞëÊÇ0x424D£¬¼´×Ö·û¡°BM¡±  
-	DWORD bfSize;//ÎÄ¼ş´óĞ¡  
-	WORD bfReserved1;//±£Áô×Ö  
-	WORD bfReserved2;//±£Áô×Ö  
-	DWORD bfOffBits;//´ÓÎÄ¼şÍ·µ½Êµ¼ÊÎ»Í¼Êı¾İµÄÆ«ÒÆ×Ö½ÚÊı  
+	//WORD bfType;//æ–‡ä»¶ç±»å‹ï¼Œå¿…é¡»æ˜¯0x424Dï¼Œå³å­—ç¬¦â€œBMâ€  
+	DWORD bfSize;//æ–‡ä»¶å¤§å°  
+	WORD bfReserved1;//ä¿ç•™å­—  
+	WORD bfReserved2;//ä¿ç•™å­—  
+	DWORD bfOffBits;//ä»æ–‡ä»¶å¤´åˆ°å®é™…ä½å›¾æ•°æ®çš„åç§»å­—èŠ‚æ•°  
 }BITMAPFILEHEADER;
 
 typedef struct tagBITMAPINFOHEADER {
-	DWORD biSize;//ĞÅÏ¢Í·´óĞ¡  
-	LONG biWidth;//Í¼Ïñ¿í¶È  
-	LONG biHeight;//Í¼Ïñ¸ß¶È  
-	WORD biPlanes;//Î»Æ½ÃæÊı£¬±ØĞëÎª1  
-	WORD biBitCount;//Ã¿ÏñËØÎ»Êı  
-	DWORD  biCompression; //Ñ¹ËõÀàĞÍ  
-	DWORD  biSizeImage; //Ñ¹ËõÍ¼Ïñ´óĞ¡×Ö½ÚÊı  
-	LONG  biXPelsPerMeter; //Ë®Æ½·Ö±æÂÊ  
-	LONG  biYPelsPerMeter; //´¹Ö±·Ö±æÂÊ  
-	DWORD  biClrUsed; //Î»Í¼Êµ¼ÊÓÃµ½µÄÉ«²ÊÊı  
-	DWORD  biClrImportant; //±¾Î»Í¼ÖĞÖØÒªµÄÉ«²ÊÊı  
-}BITMAPINFOHEADER; //Î»Í¼ĞÅÏ¢Í·¶¨Òå  
+	DWORD biSize;//ä¿¡æ¯å¤´å¤§å°  
+	LONG biWidth;//å›¾åƒå®½åº¦  
+	LONG biHeight;//å›¾åƒé«˜åº¦  
+	WORD biPlanes;//ä½å¹³é¢æ•°ï¼Œå¿…é¡»ä¸º1  
+	WORD biBitCount;//æ¯åƒç´ ä½æ•°  
+	DWORD  biCompression; //å‹ç¼©ç±»å‹  
+	DWORD  biSizeImage; //å‹ç¼©å›¾åƒå¤§å°å­—èŠ‚æ•°  
+	LONG  biXPelsPerMeter; //æ°´å¹³åˆ†è¾¨ç‡  
+	LONG  biYPelsPerMeter; //å‚ç›´åˆ†è¾¨ç‡  
+	DWORD  biClrUsed; //ä½å›¾å®é™…ç”¨åˆ°çš„è‰²å½©æ•°  
+	DWORD  biClrImportant; //æœ¬ä½å›¾ä¸­é‡è¦çš„è‰²å½©æ•°  
+}BITMAPINFOHEADER; //ä½å›¾ä¿¡æ¯å¤´å®šä¹‰  
 
-//»Ò¶ÈÍ¼Ò²Ğí»áÓÃµ½,24bitÍ¼²»ĞèÒª¡£
+				   //ç°åº¦å›¾ä¹Ÿè®¸ä¼šç”¨åˆ°,24bitå›¾ä¸éœ€è¦ã€‚
 typedef struct tagRGBQUAD {
-	BYTE rgbBlue; //¸ÃÑÕÉ«µÄÀ¶É«·ÖÁ¿  
-	BYTE rgbGreen; //¸ÃÑÕÉ«µÄÂÌÉ«·ÖÁ¿  
-	BYTE rgbRed; //¸ÃÑÕÉ«µÄºìÉ«·ÖÁ¿  
-	BYTE rgbReserved; //±£ÁôÖµ  
-}RGBQUAD;//µ÷É«°å¶¨Òå  
-//ÏñËØĞÅÏ¢  
+	BYTE rgbBlue; //è¯¥é¢œè‰²çš„è“è‰²åˆ†é‡  
+	BYTE rgbGreen; //è¯¥é¢œè‰²çš„ç»¿è‰²åˆ†é‡  
+	BYTE rgbRed; //è¯¥é¢œè‰²çš„çº¢è‰²åˆ†é‡  
+	BYTE rgbReserved; //ä¿ç•™å€¼  
+}RGBQUAD;//è°ƒè‰²æ¿å®šä¹‰  
+		 //åƒç´ ä¿¡æ¯  
 typedef struct tagIMAGEDATA //24bit
 {
 	BYTE red;
@@ -52,7 +52,9 @@ typedef struct tagIMAGEDATA //24bit
 
 BYTE* LoadBMP();
 int SaveBMP(BYTE* imageindex);
-void shrinkImage(BYTE* imageindex);
+void shrinkImageX(BYTE* imageindex, int times);
+void shrinkImageY(BYTE* imageindex, int times);
+
 void showBmpHead(BITMAPFILEHEADER pBmpHead);
 void showBmpInforHead(tagBITMAPINFOHEADER pBmpInforHead);
 
