@@ -1,10 +1,10 @@
 #include "skimg.h"
-
+using namespace std;
 BITMAPFILEHEADER strHead;
 BITMAPINFOHEADER strInfo;
 WORD *strRGB; // two-value picture  62 - 54 = 8
 int width, height;
-BYTE *RGBQ = new BYTE[1024];
+RGBQUAD *RGBQ = new RGBQUAD[256];
 
 BYTE* LoadBMP()
 {
@@ -28,9 +28,14 @@ BYTE* LoadBMP()
 		width = strInfo.biWidth;
 		height = strInfo.biHeight;
 
-		fread(RGBQ, sizeof(BYTE), 1024, fpi);   //1024 4x256
+		fread(RGBQ, sizeof(RGBQUAD), 256, fpi);   //1024 4x256
+		cout << " READ RGBQ" << endl;
+		for (int i = 0; i != 256; ++i)
+		{
+			cout << RGBQ[i].rgbBlue << " " << RGBQ[i].rgbGreen << " " << RGBQ[i].rgbRed << " " << RGBQ[i].rgbReserved << endl;
+		}
 
-		BYTE *imageindex = new BYTE[width * height]; 
+		BYTE *imageindex = new BYTE[width * height];
 		fread(imageindex, sizeof(BYTE) * width, height, fpi);
 		fclose(fpi);
 		return imageindex;
@@ -61,7 +66,7 @@ int SaveBMP(BYTE* imageindex)
 	fwrite(&bfType, sizeof(WORD), 1, fpw);
 	fwrite(&strHead, sizeof(tagBITMAPFILEHEADER), 1, fpw);
 	fwrite(&strInfo, sizeof(tagBITMAPINFOHEADER), 1, fpw);
-	fwrite(RGBQ, sizeof(BYTE), 1024, fpw);
+	fwrite(RGBQ, sizeof(RGBQUAD), 256, fpw);
 	fwrite(imageindex, sizeof(BYTE) * width, height, fpw);
 	fclose(fpw);
 	delete[] RGBQ;
@@ -70,34 +75,62 @@ int SaveBMP(BYTE* imageindex)
 }
 
 void showBmpHead(BITMAPFILEHEADER pBmpHead) {
-	std::cout << "Î»Í¼ÎÄ¼þÍ·:" << std::endl;
-	std::cout << "ÎÄ¼þ´óÐ¡:" << pBmpHead.bfSize << std::endl;
-	std::cout << "±£Áô×Ö_1:" << pBmpHead.bfReserved1 << std::endl;
-	std::cout << "±£Áô×Ö_2:" << pBmpHead.bfReserved2 << std::endl;
-	std::cout << "Êµ¼ÊÎ»Í¼Êý¾ÝµÄÆ«ÒÆ×Ö½ÚÊý:" << pBmpHead.bfOffBits << std::endl << std::endl;
+	std::cout << "ä½å›¾æ–‡ä»¶å¤´:" << std::endl;
+	std::cout << "æ–‡ä»¶å¤§å°:" << pBmpHead.bfSize << std::endl;
+	std::cout << "ä¿ç•™å­—_1:" << pBmpHead.bfReserved1 << std::endl;
+	std::cout << "ä¿ç•™å­—_2:" << pBmpHead.bfReserved2 << std::endl;
+	std::cout << "å®žé™…ä½å›¾æ•°æ®çš„åç§»å­—èŠ‚æ•°:" << pBmpHead.bfOffBits << std::endl << std::endl;
 }
 
 void showBmpInforHead(tagBITMAPINFOHEADER pBmpInforHead) {
-	std::cout << "Î»Í¼ÐÅÏ¢Í·:" << std::endl;
-	std::cout << "½á¹¹ÌåµÄ³¤¶È:" << pBmpInforHead.biSize << std::endl;
-	std::cout << "Î»Í¼¿í:" << pBmpInforHead.biWidth << std::endl;
-	std::cout << "Î»Í¼¸ß:" << pBmpInforHead.biHeight << std::endl;
-	std::cout << "biPlanesÆ½ÃæÊý:" << pBmpInforHead.biPlanes << std::endl;
-	std::cout << "biBitCount²ÉÓÃÑÕÉ«Î»Êý:" << pBmpInforHead.biBitCount << std::endl;
-	std::cout << "Ñ¹Ëõ·½Ê½:" << pBmpInforHead.biCompression << std::endl;
-	std::cout << "biSizeImageÊµ¼ÊÎ»Í¼Êý¾ÝÕ¼ÓÃµÄ×Ö½ÚÊý:" << pBmpInforHead.biSizeImage << std::endl;
-	std::cout << "X·½Ïò·Ö±æÂÊ:" << pBmpInforHead.biXPelsPerMeter << std::endl;
-	std::cout << "Y·½Ïò·Ö±æÂÊ:" << pBmpInforHead.biYPelsPerMeter << std::endl;
-	std::cout << "Ê¹ÓÃµÄÑÕÉ«Êý:" << pBmpInforHead.biClrUsed << std::endl;
-	std::cout << "ÖØÒªÑÕÉ«Êý:" << pBmpInforHead.biClrImportant << std::endl;
+	std::cout << "ä½å›¾ä¿¡æ¯å¤´:" << std::endl;
+	std::cout << "ç»“æž„ä½“çš„é•¿åº¦:" << pBmpInforHead.biSize << std::endl;
+	std::cout << "ä½å›¾å®½:" << pBmpInforHead.biWidth << std::endl;
+	std::cout << "ä½å›¾é«˜:" << pBmpInforHead.biHeight << std::endl;
+	std::cout << "biPlaneså¹³é¢æ•°:" << pBmpInforHead.biPlanes << std::endl;
+	std::cout << "biBitCounté‡‡ç”¨é¢œè‰²ä½æ•°:" << pBmpInforHead.biBitCount << std::endl;
+	std::cout << "åŽ‹ç¼©æ–¹å¼:" << pBmpInforHead.biCompression << std::endl;
+	std::cout << "biSizeImageå®žé™…ä½å›¾æ•°æ®å ç”¨çš„å­—èŠ‚æ•°:" << pBmpInforHead.biSizeImage << std::endl;
+	std::cout << "Xæ–¹å‘åˆ†è¾¨çŽ‡:" << pBmpInforHead.biXPelsPerMeter << std::endl;
+	std::cout << "Yæ–¹å‘åˆ†è¾¨çŽ‡:" << pBmpInforHead.biYPelsPerMeter << std::endl;
+	std::cout << "ä½¿ç”¨çš„é¢œè‰²æ•°:" << pBmpInforHead.biClrUsed << std::endl;
+	std::cout << "é‡è¦é¢œè‰²æ•°:" << pBmpInforHead.biClrImportant << std::endl;
 }
 
-/* ÎÄ¼þÍ· - ÐÅÏ¢Í· - µ÷É«°å - ÏñËØÐÅÏ¢Ë÷Òý */
-/* µ÷É«°å 4 BYTE £¬Ë÷Òý1BYTE EX. Ë÷Òýindex*/
-/* ÄÇÃ´ RGBQ[index] ¼´ÏñËØÐÅÏ¢£¬RGBQ[index].rgbBlue ... ÕæÊµrgbÐÅÏ¢*/
+/* æ–‡ä»¶å¤´ - ä¿¡æ¯å¤´ - è°ƒè‰²æ¿ - åƒç´ ä¿¡æ¯ç´¢å¼• */
+/* è°ƒè‰²æ¿ 4 BYTE ï¼Œç´¢å¼•1BYTE EX. ç´¢å¼•index*/
+/* é‚£ä¹ˆ RGBQ[index] å³åƒç´ ä¿¡æ¯ï¼ŒRGBQ[index].rgbBlue ... çœŸå®žrgbä¿¡æ¯*/
 
-void shrinkImage(BYTE* imageindex)
+void shrinkImageX(BYTE* imageindex, int times)
 {
-	BYTE idx; //width height  index offset
+	BYTE idx_x = 0; //width height  index offset
+	BYTE pre, now,next,clr;
+	int flag = 1;
+	cout << "Shrink Start! " << endl;
+	pre = RGBQ[0].rgbBlue;
+	while (times--)
+	{
+		for (int row = 0; row != height; row++)
+			for (int col = 0; col != width; col++)
+			{
+				idx_x = *(imageindex + row * width + col);
+				now = RGBQ[idx_x].rgbBlue;
+				if (now != pre)
+				{
+					if (flag)
+					{
+						*(imageindex + row * width + col) = 0;
+						flag = 0;
+					}
+					else flag = 1;
+				}
+				pre = now;
+			}
+	}
 
+
+}
+
+void shrinkImageU(BYTE* imageindex)
+{
 }
